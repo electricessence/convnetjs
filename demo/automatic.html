@@ -1,38 +1,39 @@
 <!doctype html>
 <html lang="en">
- <head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-  <title>ConvNetJS Automatic</title>
-  <meta name="description" content="">
-  <meta name="author" content="">
-  <link href='http://fonts.googleapis.com/css?family=Lato:300,400,900' rel='stylesheet' type='text/css'>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>ConvNetJS Automatic</title>
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link href='http://fonts.googleapis.com/css?family=Lato:300,400,900' rel='stylesheet' type='text/css'>
 
-  <script src="../build/convnet.js"></script>
-  <script src="../build/util.js"></script>
-  <script src="../build/vis.js"></script>
-  <script src="js/jquery-1.8.3.min.js"></script>
-  <script src="js/jquery.csv-0.71.min.js"></script>
-  
-  <!-- JS syntax highlighting -->
-  <script type="text/javascript" src="../syntaxhighlighter_3.0.83/scripts/shCore.js"></script>
-  <script type="text/javascript" src="../syntaxhighlighter_3.0.83/scripts/shBrushJScript.js"></script>
-  <link type="text/css" rel="stylesheet" href="../syntaxhighlighter_3.0.83/styles/shCoreDefault.css"/>
-  <script type="text/javascript">SyntaxHighlighter.all();</script>
+    <script src="../build/convnet.js"></script>
+    <script src="../src/util.js"></script>
+    <script src="../src/vis.js"></script>
+    <script src="../node_modules/jquery/dist/jquery.min.js"></script>
+    <script src="../node_modules/jquery-csv/src/jquery.csv.min.js"></script>
 
-  <link rel="stylesheet" href="css/automatic.css">
-  
-  <script src="js/automatic.js"></script>
- </head>
- <body onload="start();">
-  <div id="wrap">
+    <!-- JS syntax highlighting -->
+    <script type="text/javascript" src="../node_modules/syntaxhighlighter/build/bundle.js"></script>
+    <script type="text/javascript">SyntaxHighlighter.all();</script>
+
+    <link rel="stylesheet" href="css/automatic.css">
+
+    <script src="js/automatic.js"></script>
+</head>
+<body onload="start();">
+<div id="wrap">
     <h2>ConvNetJS Automatic Prediction Demo</h2>
     <h1>Introduction</h1>
     <p>
-    This demo illustrates the usage of ConvNetJS' <b>MagicNet</b> class, which performs fully automatic prediction given your arbitrary data. Internally, the MagicNet tries out many different types of networks, performs cross-validations of network hyper-parameters across folds of your data, and creates a final classifier by model averaging the best architectures. The API for MagicNet looks as follows:
+        This demo illustrates the usage of ConvNetJS' <b>MagicNet</b> class, which performs fully automatic prediction
+        given your arbitrary data. Internally, the MagicNet tries out many different types of networks, performs
+        cross-validations of network hyper-parameters across folds of your data, and creates a final classifier by model
+        averaging the best architectures. The API for MagicNet looks as follows:
     </p>
 
-<pre class="brush: js; toolbar: false;">
+    <pre class="brush: js; toolbar: false;">
 var opts = {}; // options struct
 opts.train_ratio = 0.7;
 opts.num_folds = 10; // number of folds to eval per candidate
@@ -56,59 +57,77 @@ function finishedBatch() {
 
     <h1>Your data</h1>
     <p>
-      Currently made input data assumptions:
+        Currently made input data assumptions:
     </p>
     <ul>
-      <li>Provide data as CSV (comma-separated) values. Leave out any header rows.</li>
-      <li>Every row is a data point.</li>
-      <li>No missing values.</li>
-      <li>Last column is the class (only classification is currently supported).</li>
+        <li>Provide data as CSV (comma-separated) values. Leave out any header rows.</li>
+        <li>Every row is a data point.</li>
+        <li>No missing values.</li>
+        <li>Last column is the class (only classification is currently supported).</li>
     </ul>
     <p>
-      The text area is pre-filled with a Car Quality Evaluation dataset to show you example input, but there are a few buttons that load some example datasets (more details on these: <a href="https://archive.ics.uci.edu/ml/datasets/Iris">Iris data</a>, <a href="https://archive.ics.uci.edu/ml/datasets/Car+Evaluation">Car Eval data</a>, <a href="https://archive.ics.uci.edu/ml/datasets/Yeast">Yeast Data</a>). A nice place to find more datasets are <a href="https://archive.ics.uci.edu/ml/datasets.html?format=mat&task=cla&att=&area=&numAtt=&numIns=&type=&sort=dateDown&view=table">UCI Repository</a> or <a href="http://mldata.org/repository/data/by_views/">mldata.org</a>.
+        The text area is pre-filled with a Car Quality Evaluation dataset to show you example input, but there are a few
+        buttons that load some example datasets (more details on these: <a
+            href="https://archive.ics.uci.edu/ml/datasets/Iris">Iris data</a>, <a
+            href="https://archive.ics.uci.edu/ml/datasets/Car+Evaluation">Car Eval data</a>, <a
+            href="https://archive.ics.uci.edu/ml/datasets/Yeast">Yeast Data</a>). A nice place to find more datasets are
+        <a href="https://archive.ics.uci.edu/ml/datasets.html?format=mat&task=cla&att=&area=&numAtt=&numIns=&type=&sort=dateDown&view=table">UCI
+            Repository</a> or <a href="http://mldata.org/repository/data/by_views/">mldata.org</a>.
     </p>
 
     <div style="text-align: center;">
-      <button class="clouds-flat-button" onclick="loadDB('data/iris.data.txt')" style="height: 40px; width: 260px; margin-bottom: 5px;">Fill Iris data</button>
-      <button class="clouds-flat-button" onclick="loadDB('data/car.data.txt')" style="height: 40px; width: 260px; margin-bottom: 5px;">Fill Car Evaluation data</button>
-      <button class="clouds-flat-button" onclick="loadDB('data/yeast.data.txt')" style="height: 40px; width: 260px; margin-bottom: 5px;">Fill Yeast data</button>
+        <button class="clouds-flat-button" onclick="loadDB('data/iris.data.txt')"
+                style="height: 40px; width: 260px; margin-bottom: 5px;">Fill Iris data
+        </button>
+        <button class="clouds-flat-button" onclick="loadDB('data/car.data.txt')"
+                style="height: 40px; width: 260px; margin-bottom: 5px;">Fill Car Evaluation data
+        </button>
+        <button class="clouds-flat-button" onclick="loadDB('data/yeast.data.txt')"
+                style="height: 40px; width: 260px; margin-bottom: 5px;">Fill Yeast data
+        </button>
     </div>
 
-    <textarea id="data-ta" style="width:100%; height:200px;">
-    </textarea>
+    <label><textarea id="data-ta" style="width:100%; height:200px;"></textarea></label>
 
-    <button class="clouds-flat-button" onclick="importTrainData()" style="width: 200px; height: 40px; margin-top: 5px;">Import Data</button>
-    (and send <input type="text" id="testsplit" maxlength="3" value="20" style="width:40px;">% of imported data randomly into Test Set below)
+    <button class="clouds-flat-button" onclick="importTrainData()" style="width: 200px; height: 40px; margin-top: 5px;">
+        Import Data
+    </button>
+    <label>(and send <input type="text" id="testsplit" maxlength="3" value="20" style="width:40px;">% of imported data
+        randomly into Test Set below)</label>
 
     <div id='prepromsg'></div>
     <div id='datamsg'></div>
-    
+
     <h1>Cross-Validation</h1>
-    
+
     <div>
-    <input type="text" id="labelix" maxlength="4" value="-1" style="width:40px;">
-    Index of column to classify as target. (e.g. 0 = first column, -1 = last column)
+        <label><input type="text" id="labelix" maxlength="4" value="-1" style="width:40px;">
+        Index of column to classify as target. (e.g. 0 = first column, -1 = last column)</label>
     </div>
 
     <div>
-    <input type="text" id="trainp" name="train_split" maxlength="3" value="70" style="width:20px;">
-    Percent of data to use for training (rest will be validation)
+        <label><input type="text" id="trainp" name="train_split" maxlength="3" value="70" style="width:20px;">
+        Percent of data to use for training (rest will be validation)</label>
     </div>
 
     <div>
-    <input type="text" id="foldsnum" name="folds_number" maxlength="3" value="3" style="width:40px;"> Number of data folds to evaluate per candidate
+        <label><input type="text" id="foldsnum" name="folds_number" maxlength="3" value="3" style="width:40px;"> Number of data
+        folds to evaluate per candidate</label>
     </div>
 
     <div>
-    <input type="text" id="candsnum" name="candidates_number" maxlength="4" value="50" style="width:40px;"> Number of candidates in a batch, to evaluate in parallel
+        <label><input type="text" id="candsnum" name="candidates_number" maxlength="4" value="50" style="width:40px;"> Number
+        of candidates in a batch, to evaluate in parallel</label>
     </div>
 
     <div>
-    <input type="text" id="epochsnum" name="epochs_number" maxlength="4" value="40" style="width:40px;"> Number of epochs to make over each fold
+        <label><input type="text" id="epochsnum" name="epochs_number" maxlength="4" value="40" style="width:40px;"> Number of
+        epochs to make over each fold</label>
     </div>
 
     <div>
-    Number of Neurons in each layer: Min <input type="text" id="nnmin" maxlength="4" value="5" style="width:40px;"> Max <input type="text" id="nnmax" maxlength="4" value="30" style="width:40px;"> 
+        <label> Number of Neurons in each layer: Min <input type="text" id="nnmin" maxlength="4" value="5" style="width:40px;"></label>
+        <label>Max <input type="text" id="nnmax" maxlength="4" value="30" style="width:40px;"></label>
     </div>
 
     <!--
@@ -136,48 +155,61 @@ function finishedBatch() {
     Max: <input type="text" id="mommax" maxlength="4" value="0.9" style="width:40px;"> 
     </div>
     -->
-    
-    <button class="clouds-flat-button" onclick="startCV()" style="width: 200px; height: 40px; margin-top: 5px;">Start/Restart</button>
+
+    <button class="clouds-flat-button" onclick="startCV()" style="width: 200px; height: 40px; margin-top: 5px;">
+        Start/Restart
+    </button>
     <hr>
 
-    <p>Below: graph of the <b>validation accuracy</b> for current batch of candidate models as a function of the number of training points they have seen during training. Good networks will rise up as high as possible and stay there. The best performer is printed in detail below the graph. The graph is less wiggly if there is more data.</p>
+    <p>Below: graph of the <b>validation accuracy</b> for current batch of candidate models as a function of the number
+        of training points they have seen during training. Good networks will rise up as high as possible and stay
+        there. The best performer is printed in detail below the graph. The graph is less wiggly if there is more data.
+    </p>
     <div id="foldreport"></div>
     <div id="candsreport"></div>
 
     <canvas id="valgraph" width="800" height="400"></canvas>
     <div id="bestmodel"></div>
     <div id="bestmodeloverall"></div>
-    
+
     <h1>Evaluate on Test Set</h1>
     <p>
-      Paste a test set in box below to evaluate the final test accuracy, which is based on a model-averaged ensemble of the best discovered network from the training data above. The CSV pasted below should be in the same format as the one used for training data above. The text field is pre-filled with the training data.
+        Paste a test set in box below to evaluate the final test accuracy, which is based on a model-averaged ensemble
+        of the best discovered network from the training data above. The CSV pasted below should be in the same format
+        as the one used for training data above. The text field is pre-filled with the training data.
     </p>
-    
+
     <div>
-    <input type="text" id="ensemblenum" maxlength="3" value="10" style="width:20px;"> Number of best models to average in the ensemble network
+        <label><input type="text" id="ensemblenum" maxlength="3" value="10" style="width:20px;"> Number of best models to
+        average in the ensemble network</label>
     </div>
 
-    <textarea id="data-te" style="width:100%; height:200px;">
-    </textarea>
-    <button class="clouds-flat-button" onclick="testEval()" style="width: 200px; height: 40px; margin-top: 5px;">Evaluate Test Accuracy</button>
+    <label><textarea id="data-te" style="width:100%; height:200px;">
+    </textarea></label>
+    <button class="clouds-flat-button" onclick="testEval()" style="width: 200px; height: 40px; margin-top: 5px;">
+        Evaluate Test Accuracy
+    </button>
     <div id='datamsgtest'></div>
     <br>
     <div id="testresult"></div>
 
     <h1>Export Best Network</h1>
-    <button class="clouds-flat-button" onclick="exportMagicNet()" style="width: 200px; height: 40px; margin-top: 5px;">Export</button><br><br>
-    <textarea id="taexport" style="width:100%; height:200px;">
-    </textarea>
+    <button class="clouds-flat-button" onclick="exportMagicNet()" style="width: 200px; height: 40px; margin-top: 5px;">
+        Export
+    </button>
+    <br><br>
+    <label><textarea id="taexport" style="width:100%; height:200px;"></textarea></label>
 
-    Above you can export a trained MagicNet in JSON format. The exported MagicNet is simply a thin wrapper around a list of the best networks that were discovered during cross-validation and it can be loaded and used again as follows:
-<pre class="brush: js; toolbar: false;">
+    Above you can export a trained MagicNet in JSON format. The exported MagicNet is simply a thin wrapper around a list
+    of the best networks that were discovered during cross-validation and it can be loaded and used again as follows:
+    <pre class="brush: js; toolbar: false;">
 var magicNet = new convnetjs.MagicNet();
 magicNet.fromJSON(json);
 magicNet.predict(some_vol); // ready to use!
 </pre>
-    
+
     <br><br><br><br><br><br><br><br>
-    
-  </div>
- </body>
+
+</div>
+</body>
 </html>

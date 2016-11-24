@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "outDir": "./build",
+    "module": "umd",
+    "target": "es5",
+    "sourceMap": true,
+    "strictNullChecks": true,
+    "moduleResolution": "node"
+  }
+}

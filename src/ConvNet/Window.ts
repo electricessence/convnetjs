@@ -1,6 +1,4 @@
 /* contains various utility functions */
-import maxmin from "./utility/maxmin";
-import f2t from "./utility/f2t";
 
 
 /**
@@ -46,5 +44,4 @@ export class Window
 }
 
 
-export {maxmin};
-export {f2t};
+

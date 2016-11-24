@@ -35,7 +35,7 @@ function runExample() {
 
 function start() {
 
-  // Conv Layer definition used in convnet benchmarks
+  // Conv LayerDefinition definition used in convnet benchmarks
   opt = { in_sx:128, in_sy:128, in_depth:3, sx:11, filters:96, stride: 1, pad: 0};
   layer = new convnetjs.ConvLayer(opt);
   x = new convnetjs.Vol(128, 128, 3);
