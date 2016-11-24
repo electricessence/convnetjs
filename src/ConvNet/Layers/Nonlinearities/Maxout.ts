@@ -1,8 +1,10 @@
 import {LayerBase} from "../LayerBase";
 import {Layer, LayerIn} from "../../Layer";
 import {Vol} from "../../Vol";
-import * as LayerType from "../../LayerTypes";
 import {IMap} from "typescript-dotnet-umd/IMap";
+import {LayerTypeValue} from "../../LayerTypeValue";
+import {LayerType} from "../../LayerType";
+
 
 
 /**
@@ -11,9 +13,9 @@ import {IMap} from "typescript-dotnet-umd/IMap";
  * where x is a vector of size group_size. Ideally of course,
  * the input size should be exactly divisible by group_size
  */
-export class MaxoutLayer extends LayerBase<MaxoutLayer.JSON>
+export class MaxoutLayer extends LayerBase<MaxoutLayer.JSON> implements MaxoutLayer.Unique
 {
-	readonly layer_type:LayerType.Maxout;
+	readonly layer_type:LayerTypeValue.Maxout;
 	group_size:number;
 	switches:Float64Array;
 
@@ -22,7 +24,7 @@ export class MaxoutLayer extends LayerBase<MaxoutLayer.JSON>
 		let {in_sx, in_sy, in_depth} = opt;
 		let group_size = typeof opt.group_size!=='undefined' ? opt.group_size : 2;
 		let depth = Math.floor(in_depth/group_size);
-		super('maxout', in_sx, in_sy, depth);
+		super(LayerType.Maxout, in_sx, in_sy, depth);
 
 		// required
 		this.group_size = group_size;

@@ -2,9 +2,8 @@ import {LayerBase} from "./LayerBase";
 import {Layer, LayerIn} from "../Layer";
 import {initialize} from "typescript-dotnet-umd/System/Collections/Array/Utility";
 import {Vol} from "../Vol";
-import * as LayerType from "../LayerTypes";
 import {IMap} from "typescript-dotnet-umd/IMap";
-
+import {LayerTypeValue} from "../LayerTypeValue";
 
 
 /**
@@ -17,7 +16,7 @@ import {IMap} from "typescript-dotnet-umd/IMap";
  */
 export class DropoutLayer extends LayerBase<DropoutLayer.JSON>
 {
-	readonly layer_type:LayerType.Dropout;
+	readonly layer_type:LayerTypeValue.Dropout;
 	drop_prob:number;
 	dropped:boolean[];
 

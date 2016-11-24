@@ -1351,7 +1351,7 @@ getJasmineRequireObj().pp = function(j$) {
       } else if (value === null) {
         this.emitScalar('null');
       } else if (value === j$.getGlobal()) {
-        this.emitScalar('<global>');
+        this.emitScalar('<Layers>');
       } else if (value.jasmineToString) {
         this.emitScalar(value.jasmineToString());
       } else if (typeof value === 'string') {

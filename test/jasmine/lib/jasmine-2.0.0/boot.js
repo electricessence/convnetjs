@@ -75,7 +75,7 @@
   };
 
   /**
-   * Add all of the Jasmine global/public interface to the proper global, so a project can use the public interface directly. For example, calling `describe` in specs instead of `jasmine.getEnv().describe`.
+   * Add all of the Jasmine Layers/public interface to the proper Layers, so a project can use the public interface directly. For example, calling `describe` in specs instead of `jasmine.getEnv().describe`.
    */
   if (typeof window == "undefined" && typeof exports == "object") {
     extend(exports, jasmineInterface);

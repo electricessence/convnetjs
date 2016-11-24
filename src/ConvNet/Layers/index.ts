@@ -1,5 +1,3 @@
-import * as LayerType from "../LayerTypes";
-import {LayerTypeValue} from "../LayerTypes";
 import {LayerConstructor, Layer, LayerOut, LayerIn} from "../Layer";
 import {IMap} from "typescript-dotnet-umd/IMap";
 import {InputLayer} from "./Input";
@@ -13,6 +11,7 @@ import {SigmoidLayer} from "./Nonlinearities/Sigmoid";
 import {TanhLayer} from "./Nonlinearities/Tanh";
 import {LossBase} from "./Loss/LossBase";
 import {LocalResponseNormalizationLayer} from "./LocalResponseNormalization";
+import {LayerTypeValue} from "../LayerTypeValue";
 
 const TypeRegistry:IMap<LayerConstructor> = {
 	input:InputLayer,
@@ -28,18 +27,29 @@ const TypeRegistry:IMap<LayerConstructor> = {
 };
 Object.freeze(TypeRegistry);
 
-export function newFromType(type:LayerType.Input, options?:LayerOut):InputLayer
-export function newFromType(type:LayerType.Dropout, options?:DropoutLayer.Options):DropoutLayer
-export function newFromType(type:LayerType.Softmax, options?:LossBase.Options):SoftmaxLayer
-export function newFromType(type:LayerType.Regression, options?:LossBase.Options):RegressionLayer
-export function newFromType(type:LayerType.SVM, options?:LossBase.Options):SVMLayer
-export function newFromType(type:LayerType.Sigmoid, options?:LayerIn):SigmoidLayer
-export function newFromType(type:LayerType.Maxout, options?:MaxoutLayer.Options):MaxoutLayer
-export function newFromType(type:LayerType.Relu, options?:LayerIn):ReluLayer
-export function newFromType(type:LayerType.Tanh, options?:LayerIn):TanhLayer
-export function newFromType(type:LayerType.LocalResponseNormalization, options?:LocalResponseNormalizationLayer.Options):LocalResponseNormalizationLayer
-export function newFromType(type:LayerTypeValue, options?:IMap<any>):Layer {
+export function newFromType(type:LayerTypeValue.Input, options?:LayerOut):InputLayer
+export function newFromType(type:LayerTypeValue.Dropout, options?:DropoutLayer.Options):DropoutLayer
+export function newFromType(type:LayerTypeValue.Softmax, options?:LossBase.Options):SoftmaxLayer
+export function newFromType(type:LayerTypeValue.Regression, options?:LossBase.Options):RegressionLayer
+export function newFromType(type:LayerTypeValue.SVM, options?:LossBase.Options):SVMLayer
+export function newFromType(type:LayerTypeValue.Sigmoid, options?:LayerIn):SigmoidLayer
+export function newFromType(type:LayerTypeValue.Maxout, options?:MaxoutLayer.Options):MaxoutLayer
+export function newFromType(type:LayerTypeValue.Relu, options?:LayerIn):ReluLayer
+export function newFromType(type:LayerTypeValue.Tanh, options?:LayerIn):TanhLayer
+export function newFromType(type:LayerTypeValue.LocalResponseNormalization, options?:LocalResponseNormalizationLayer.Options):LocalResponseNormalizationLayer
+export function newFromType(type:LayerTypeValue.Any, options?:IMap<any>):Layer {
 	return new TypeRegistry[type](options);
 }
 
-export {InputLayer, DropoutLayer}
+export {
+	InputLayer,
+	DropoutLayer,
+	RegressionLayer,
+	SoftmaxLayer,
+	SVMLayer,
+	MaxoutLayer,
+	ReluLayer,
+	SigmoidLayer,
+	TanhLayer,
+	LocalResponseNormalizationLayer
+}

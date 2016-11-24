@@ -1,5 +1,5 @@
-import {LayerTypeValue} from "./LayerTypes";
 import {IMap} from "typescript-dotnet-umd/IMap";
+import {LayerTypeValue} from "./LayerTypeValue";
 
 
 export interface LayerIn {
@@ -15,13 +15,13 @@ export interface LayerOut {
 }
 
 export interface Layer extends LayerOut {
-	layer_type:LayerTypeValue;
+	layer_type:LayerTypeValue.Any;
 }
 
 export interface LayerDefinition
 {
-	type:LayerTypeValue;
-	activation?:LayerTypeValue;
+	type:LayerTypeValue.Any;
+	activation?:LayerTypeValue.Any;
 	num_neurons?:number;
 	num_classes?:number;
 	bias_pref?:number;

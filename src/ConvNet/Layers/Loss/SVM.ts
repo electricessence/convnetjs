@@ -1,15 +1,16 @@
 import {LossBase} from "./LossBase";
-import * as LayerType from "../../LayerTypes";
 import {Integer} from "typescript-dotnet-umd/System/Integer";
+import {LayerTypeValue} from "../../LayerTypeValue";
+import {LayerType} from "../../LayerType";
 
 
 export class SVMLayer extends LossBase
 {
-	readonly layer_type:LayerType.SVM;
+	readonly layer_type:LayerTypeValue.SVM;
 
 	constructor(opt:LossBase.Options = <any>{})
 	{
-		super('svm', opt);
+		super(LayerType.SVM, opt);
 	}
 
 	backward():never

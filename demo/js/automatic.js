@@ -183,7 +183,7 @@
   }
 
   var magicNet = null;
-  function startCV() { // takes in train_dataset global
+  function startCV() { // takes in train_dataset Layers
     var opts = {}
     opts.train_ratio = parseInt($("#trainp").val())/100.0;
     opts.num_folds = parseInt($("#foldsnum").val());

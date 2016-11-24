@@ -1,7 +1,8 @@
 import {BasicLayerBase} from "../LayerBase";
 import {LayerIn} from "../../Layer";
 import {Vol} from "../../Vol";
-import * as LayerType from "../../LayerTypes";
+import {LayerTypeValue} from "../../LayerTypeValue";
+import {LayerType} from "../../LayerType";
 
 
 /**
@@ -11,11 +12,11 @@ import * as LayerType from "../../LayerTypes";
  */
 export class ReluLayer extends BasicLayerBase
 {
-	readonly layer_type:LayerType.Relu;
+	readonly layer_type:LayerTypeValue.Relu;
 
 	constructor(options:LayerIn = <any>{})
 	{
-		super('relu', options);
+		super(LayerType.Relu, options);
 	}
 
 	forward(V:Vol, is_training?:boolean):Vol

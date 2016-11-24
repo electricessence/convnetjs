@@ -1,5 +1,6 @@
 import {assert} from '../utility/assert';
 import {LayerDefinition} from "./Layer";
+import * as Layers from './Layers/index';
 
 /**
  * Net manages a set of layers
@@ -24,66 +25,7 @@ export class Net
 		assert(defs[0].type==='input', 'Error! First layer must be the input layer, to declare size of inputs');
 
 		// desugar layer_defs for adding activation, dropout layers etc
-		const desugar = function()
-		{
-			const new_defs:LayerDefinition[] = [];
-			for(let i = 0; i<defs.length; i++)
-			{
-				const def = defs[i];
-
-				if(def.type==='softmax' || def.type==='svm')
-				{
-					// add an fc layer here, there is no reason the user should
-					// have to worry about this and we almost always want to
-					new_defs.push({type: 'fc', num_neurons: def.num_classes});
-				}
-
-				if(def.type==='regression')
-				{
-					// add an fc layer here, there is no reason the user should
-					// have to worry about this and we almost always want to
-					new_defs.push({type: 'fc', num_neurons: def.num_neurons});
-				}
-
-				if((def.type==='fc' || def.type==='conv')
-					&& typeof(def.bias_pref)==='undefined')
-				{
-					def.bias_pref = 0.0;
-					if(typeof def.activation!=='undefined' && def.activation==='relu')
-					{
-						def.bias_pref = 0.1; // relus like a bit of positive bias to get gradients early
-						// otherwise it's technically possible that a relu unit will never turn on (by chance)
-						// and will never get any gradient and never contribute any computation. Dead relu.
-					}
-				}
-
-				new_defs.push(def);
-
-				if(typeof def.activation!=='undefined')
-				{
-					if(def.activation==='relu')
-					{ new_defs.push({type: 'relu'}); }
-					else if(def.activation==='sigmoid')
-					{ new_defs.push({type: 'sigmoid'}); }
-					else if(def.activation==='tanh')
-					{ new_defs.push({type: 'tanh'}); }
-					else if(def.activation==='maxout')
-					{
-						// create maxout activation, and pass along group size, if provided
-						const gs = typeof def.group_size!=='undefined' ? def.group_size : 2;
-						new_defs.push({type: 'maxout', group_size: gs});
-					}
-					else
-					{ console.error('ERROR unsupported activation ' + def.activation); }
-				}
-				if(typeof def.drop_prob!=='undefined' && def.type!=='dropout')
-				{
-					new_defs.push({type: 'dropout', drop_prob: def.drop_prob});
-				}
-
-			}
-			return new_defs;
-		};
+		const desugar = ;
 		defs = desugar(defs);
 
 		// create the layers
@@ -102,43 +44,43 @@ export class Net
 			switch(def.type)
 			{
 				case 'fc':
-					this.layers.push(new global.FullyConnLayer(def));
+					this.layers.push(new Layers.FullyConnLayer(def));
 					break;
 				case 'lrn':
-					this.layers.push(new global.LocalResponseNormalizationLayer(def));
+					this.layers.push(new Layers.LocalResponseNormalizationLayer(def));
 					break;
 				case 'dropout':
-					this.layers.push(new global.DropoutLayer(def));
+					this.layers.push(new Layers.DropoutLayer(def));
 					break;
 				case 'input':
-					this.layers.push(new global.InputLayer(def));
+					this.layers.push(new Layers.InputLayer(def));
 					break;
 				case 'softmax':
-					this.layers.push(new global.SoftmaxLayer(def));
+					this.layers.push(new Layers.SoftmaxLayer(def));
 					break;
 				case 'regression':
-					this.layers.push(new global.RegressionLayer(def));
+					this.layers.push(new Layers.RegressionLayer(def));
 					break;
 				case 'conv':
-					this.layers.push(new global.ConvLayer(def));
+					this.layers.push(new Layers.ConvLayer(def));
 					break;
 				case 'pool':
-					this.layers.push(new global.PoolLayer(def));
+					this.layers.push(new Layers.PoolLayer(def));
 					break;
 				case 'relu':
-					this.layers.push(new global.ReluLayer(def));
+					this.layers.push(new Layers.ReluLayer(def));
 					break;
 				case 'sigmoid':
-					this.layers.push(new global.SigmoidLayer(def));
+					this.layers.push(new Layers.SigmoidLayer(def));
 					break;
 				case 'tanh':
-					this.layers.push(new global.TanhLayer(def));
+					this.layers.push(new Layers.TanhLayer(def));
 					break;
 				case 'maxout':
-					this.layers.push(new global.MaxoutLayer(def));
+					this.layers.push(new Layers.MaxoutLayer(def));
 					break;
 				case 'svm':
-					this.layers.push(new global.SVMLayer(def));
+					this.layers.push(new Layers.SVMLayer(def));
 					break;
 				default:
 					console.error('ERROR: UNRECOGNIZED LAYER TYPE: ' + def.type);
@@ -235,31 +177,31 @@ export class Net
 			const t = Lj.layer_type;
 			let L;
 			if(t==='input')
-			{ L = new global.InputLayer(); }
+			{ L = new Layers.InputLayer(); }
 			if(t==='relu')
-			{ L = new global.ReluLayer(); }
+			{ L = new Layers.ReluLayer(); }
 			if(t==='sigmoid')
-			{ L = new global.SigmoidLayer(); }
+			{ L = new Layers.SigmoidLayer(); }
 			if(t==='tanh')
-			{ L = new global.TanhLayer(); }
+			{ L = new Layers.TanhLayer(); }
 			if(t==='dropout')
-			{ L = new global.DropoutLayer(); }
+			{ L = new Layers.DropoutLayer(); }
 			if(t==='conv')
-			{ L = new global.ConvLayer(); }
+			{ L = new Layers.ConvLayer(); }
 			if(t==='pool')
-			{ L = new global.PoolLayer(); }
+			{ L = new Layers.PoolLayer(); }
 			if(t==='lrn')
-			{ L = new global.LocalResponseNormalizationLayer(); }
+			{ L = new Layers.LocalResponseNormalizationLayer(); }
 			if(t==='softmax')
-			{ L = new global.SoftmaxLayer(); }
+			{ L = new Layers.SoftmaxLayer(); }
 			if(t==='regression')
-			{ L = new global.RegressionLayer(); }
+			{ L = new Layers.RegressionLayer(); }
 			if(t==='fc')
-			{ L = new global.FullyConnLayer(); }
+			{ L = new Layers.FullyConnLayer(); }
 			if(t==='maxout')
-			{ L = new global.MaxoutLayer(); }
+			{ L = new Layers.MaxoutLayer(); }
 			if(t==='svm')
-			{ L = new global.SVMLayer(); }
+			{ L = new Layers.SVMLayer(); }
 			L.fromJSON(Lj);
 			this.layers.push(L);
 		}
@@ -268,3 +210,64 @@ export class Net
 }
 
 export default Net;
+
+function desugar(defs:LayerDefinition[])
+{
+	const new_defs:LayerDefinition[] = [];
+	for(let i = 0; i<defs.length; i++)
+	{
+		const def = defs[i];
+
+		if(def.type==='softmax' || def.type==='svm')
+		{
+			// add an fc layer here, there is no reason the user should
+			// have to worry about this and we almost always want to
+			new_defs.push({type: 'fc', num_neurons: def.num_classes});
+		}
+
+		if(def.type==='regression')
+		{
+			// add an fc layer here, there is no reason the user should
+			// have to worry about this and we almost always want to
+			new_defs.push({type: 'fc', num_neurons: def.num_neurons});
+		}
+
+		if((def.type==='fc' || def.type==='conv')
+			&& typeof(def.bias_pref)==='undefined')
+		{
+			def.bias_pref = 0.0;
+			if(typeof def.activation!=='undefined' && def.activation==='relu')
+			{
+				def.bias_pref = 0.1; // relus like a bit of positive bias to get gradients early
+				// otherwise it's technically possible that a relu unit will never turn on (by chance)
+				// and will never get any gradient and never contribute any computation. Dead relu.
+			}
+		}
+
+		new_defs.push(def);
+
+		if(typeof def.activation!=='undefined')
+		{
+			if(def.activation==='relu')
+			{ new_defs.push({type: 'relu'}); }
+			else if(def.activation==='sigmoid')
+			{ new_defs.push({type: 'sigmoid'}); }
+			else if(def.activation==='tanh')
+			{ new_defs.push({type: 'tanh'}); }
+			else if(def.activation==='maxout')
+			{
+				// create maxout activation, and pass along group size, if provided
+				const gs = typeof def.group_size!=='undefined' ? def.group_size : 2;
+				new_defs.push({type: 'maxout', group_size: gs});
+			}
+			else
+			{ console.error('ERROR unsupported activation ' + def.activation); }
+		}
+		if(typeof def.drop_prob!=='undefined' && def.type!=='dropout')
+		{
+			new_defs.push({type: 'dropout', drop_prob: def.drop_prob});
+		}
+
+	}
+	return new_defs;
+}

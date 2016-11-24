@@ -1,7 +1,8 @@
-import {Vol} from "../../Vol";
-import {LayerIn} from "../../Layer";
 import {BasicLayerBase} from "../LayerBase";
-import * as LayerType from "../../LayerTypes";
+import {LayerIn} from "../../Layer";
+import {Vol} from "../../Vol";
+import {LayerType} from "../../LayerType";
+import {LayerTypeValue} from "../../LayerTypeValue";
 
 /**
  * Implements Tanh non-linearity element-wise
@@ -10,11 +11,11 @@ import * as LayerType from "../../LayerTypes";
  */
 export class TanhLayer extends BasicLayerBase
 {
-	readonly layer_type:LayerType.Tanh;
+	readonly layer_type:LayerTypeValue.Tanh;
 
 	constructor(options:LayerIn = <any>{})
 	{
-		super('tanh', options);
+		super(LayerType.Tanh, options);
 	}
 
 

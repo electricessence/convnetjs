@@ -1,7 +1,9 @@
-import {Vol} from "../../Vol";
 import {LayerIn} from "../../Layer";
+import {Vol} from "../../Vol";
 import {BasicLayerBase} from "../LayerBase";
-import * as LayerType from "../../LayerTypes";
+import {LayerTypeValue} from "../../LayerTypeValue";
+import {LayerType} from "../../LayerType";
+
 
 /**
  * Implements Sigmoid non-linearity element-wise
@@ -10,11 +12,11 @@ import * as LayerType from "../../LayerTypes";
  */
 export class SigmoidLayer extends BasicLayerBase
 {
-	readonly layer_type:LayerType.Sigmoid;
+	readonly layer_type:LayerTypeValue.Sigmoid;
 
 	constructor(options:LayerIn = <any>{})
 	{
-		super('sigmoid', options);
+		super(LayerType.Sigmoid, options);
 	}
 
 	forward(V:Vol, is_training?:boolean):Vol

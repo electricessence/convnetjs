@@ -1,14 +1,14 @@
-import {LayerTypeValue} from "../../LayerTypes";
 import {LayerBase} from "../LayerBase";
 import {LayerIn, Layer} from "../../Layer";
 import {IMap} from "typescript-dotnet-umd/IMap";
 import {Vol} from "../../Vol";
+import {LayerTypeValue} from "../../LayerTypeValue";
 
 export abstract class LossBase extends LayerBase<LossBase.JSON>
 {
 	num_inputs:number;
 
-	constructor(layer_type:LayerTypeValue, opt:LayerIn)
+	constructor(layer_type:LayerTypeValue.Any, opt:LayerIn)
 	{
 		let {in_sx, in_sy, in_depth} = opt;
 		let depth = in_sx*in_sy*in_depth;

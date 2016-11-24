@@ -5,14 +5,15 @@
 // - ConvLayer does convolutions (so weight sharing spatially)
 // putting them together in one file because they are very similar
 import {LayerIn, Layer} from "../../Layer";
-import {Vol} from "../../Vol";
+import {LayerTypeValue} from "../../LayerTypeValue";
 import {LayerBase} from "../LayerBase";
-import * as LayerType from "../../LayerTypes";
+import {Vol} from "../../Vol";
 import {IMap} from "typescript-dotnet-umd/IMap";
+import {LayerType} from "../../LayerType";
 
 export class ConvLayer extends LayerBase<ConvLayer.JSON> implements ConvLayer.Unique, LayerIn
 {
-	readonly layer_type:LayerType.Conv;
+	readonly layer_type:LayerTypeValue.Conv;
 
 	in_sx:number;
 	in_sy:number;
@@ -38,7 +39,7 @@ export class ConvLayer extends LayerBase<ConvLayer.JSON> implements ConvLayer.Un
 		// note we are doing floor, so if the strided convolution of the filter doesn't fit into the input
 		// volume exactly, the output volume will be trimmed and not contain the (incomplete) computed
 		// final application.
-		super("conv",
+		super(LayerType.Conv,
 			Math.floor((in_sx + pad*2 - sx)/stride + 1),
 			Math.floor((in_sy + pad*2 - sy)/stride + 1),
 			options.filters);
@@ -262,9 +263,9 @@ export module ConvLayer
 	{
 		filters:number;
 	}
+
 	export interface JSON extends Layer, LayerIn, Unique
 	{
-		in_depth; // depth of input volume
 		filters:Vol[];
 	}
 }

@@ -2,12 +2,12 @@ import {getDefault} from "../../utility/getDefault";
 import {Vol} from "../Vol";
 import {LayerBase} from "./LayerBase";
 import {Layer, LayerOut} from "../Layer";
-import * as LayerType from "../LayerTypes";
+import {LayerTypeValue} from "../LayerTypes";
 
 
 export class InputLayer extends LayerBase<Layer>
 {
-	readonly layer_type:LayerType.Input;
+	readonly layer_type:LayerTypeValue.Input;
 	in_act:Vol;
 	out_act:Vol;
 

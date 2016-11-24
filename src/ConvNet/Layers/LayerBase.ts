@@ -1,12 +1,13 @@
-import {LayerTypeValue} from "../LayerTypes";
 import {JsonSerializable} from "../../JsonSerializable";
 import {Vol} from "../Vol";
 import {Layer, LayerIn} from "../Layer";
 import {IMap} from "typescript-dotnet-umd/IMap";
+import {LayerTypeValue} from "../LayerTypeValue";
+
 export abstract class LayerBase<TJson extends Layer> implements JsonSerializable<TJson>
 {
 	constructor(
-		public readonly layer_type:LayerTypeValue,
+		public readonly layer_type:LayerTypeValue.Any,
 		public out_sx:number,
 		public out_sy:number,
 		public out_depth:number) {
@@ -53,7 +54,7 @@ export abstract class LayerBase<TJson extends Layer> implements JsonSerializable
 
 export abstract class BasicLayerBase extends LayerBase<Layer>
 {
-	constructor(layer_type:LayerTypeValue, opt:LayerIn)
+	constructor(layer_type:LayerTypeValue.Any, opt:LayerIn)
 	{
 		let {in_sx, in_sy, in_depth} = opt;
 		super(layer_type, in_sx, in_sy, in_depth);

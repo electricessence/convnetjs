@@ -1,7 +1,9 @@
-import {Vol} from "../../Vol";
+import {LayerTypeValue} from "../../LayerTypeValue";
 import {LossBase} from "./LossBase";
-import * as LayerType from "../../LayerTypes";
 import {Integer} from "typescript-dotnet-umd/System/Integer";
+import {Vol} from "../../Vol";
+import {LayerType} from "../../LayerType";
+
 
 /*
 	Layers that implement a loss. Currently these are the layers that
@@ -19,13 +21,13 @@ import {Integer} from "typescript-dotnet-umd/System/Integer";
  */
 export class SoftmaxLayer extends LossBase
 {
-	readonly layer_type:LayerType.Softmax;
+	readonly layer_type:LayerTypeValue.Softmax;
 
 	protected es:Float64Array;
 
 	constructor(opt:LossBase.Options = <any>{})
 	{
-		super('softmax',opt);
+		super(LayerType.Softmax,opt);
 	}
 
 	forward(V:Vol, is_training?:boolean):Vol

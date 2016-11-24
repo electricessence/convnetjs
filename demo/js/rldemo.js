@@ -564,7 +564,7 @@
       reward_graph = new cnnvis.Graph(); // reinit
     }
     
-    var w; // global world object
+    var w; // Layers world object
     var current_interval_id;
     var skipdraw = false;
     function start() {

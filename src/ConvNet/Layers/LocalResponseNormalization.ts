@@ -1,6 +1,6 @@
 import {LayerIn, Layer} from "../Layer";
+import {LayerTypeValue} from "../LayerTypeValue";
 import {LayerBase} from "./LayerBase";
-import * as LayerType from "../LayerTypes";
 import {IMap} from "typescript-dotnet-umd/IMap";
 import {Vol} from "../Vol";
 
@@ -11,7 +11,7 @@ import {Vol} from "../Vol";
  */
 export class LocalResponseNormalizationLayer extends LayerBase<LocalResponseNormalizationLayer.JSON> implements LocalResponseNormalizationLayer.Unique
 {
-	readonly layer_type:LayerType.LocalResponseNormalization;
+	readonly layer_type:LayerTypeValue.LocalResponseNormalization;
 
 	k:number;
 	n:number;

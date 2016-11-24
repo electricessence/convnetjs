@@ -1,6 +1,7 @@
 import {LossBase} from "./LossBase";
-import * as LayerType from "../../LayerTypes";
 import {Integer} from "typescript-dotnet-umd/System/Integer";
+import {LayerTypeValue} from "../../LayerTypeValue";
+import {LayerType} from "../../LayerType";
 
 
 /**
@@ -11,11 +12,11 @@ import {Integer} from "typescript-dotnet-umd/System/Integer";
  */
 export class RegressionLayer extends LossBase
 {
-	readonly layer_type:LayerType.Regression;
+	readonly layer_type:LayerTypeValue.Regression;
 
 	constructor(opt:LossBase.Options = <any>{})
 	{
-		super('regression', opt);
+		super(LayerType.Regression, opt);
 	}
 
 	backward():never

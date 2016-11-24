@@ -23,7 +23,6 @@ export class Experience
 }
 
 
-
 /**
  * A Brain object does all the magic.
  * over time it receives some inputs and some rewards
