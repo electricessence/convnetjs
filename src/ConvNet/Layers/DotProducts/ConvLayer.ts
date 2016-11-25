@@ -4,35 +4,31 @@
 // - FullyConn is fully connected dot products
 // - ConvLayer does convolutions (so weight sharing spatially)
 // putting them together in one file because they are very similar
-import {LayerIn, Layer} from "../../Layer";
+import {LayerIn} from "../../Layer";
 import {LayerTypeValue} from "../../LayerTypeValue";
-import {LayerBase} from "../LayerBase";
 import {Vol} from "../../Vol";
 import {IMap} from "typescript-dotnet-umd/IMap";
 import {LayerType} from "../../LayerType";
+import {ConvLayerBase} from "./ConvLayerBase";
 
-export class ConvLayer extends LayerBase<ConvLayer.JSON> implements ConvLayer.Unique, LayerIn
+export class ConvLayer
+extends ConvLayerBase<ConvLayer.JSON>
+implements ConvLayer.Unique, LayerIn
 {
 	readonly layer_type:LayerTypeValue.Conv;
 
+	in_depth:number;
 	in_sx:number;
 	in_sy:number;
-	in_depth:number;
 
 	sx:number;
 	sy:number;
 	stride:number;
-	l1_decay_mul:number;
-	l2_decay_mul:number;
 	pad:number;
-	filters:Vol[];
-	biases:Vol;
-	bias_pref:number;
-
 
 	constructor(options:ConvLayer.Options = <any>{})
 	{
-		let {in_sx, in_sy, in_depth, sx, sy, stride, l1_decay_mul, l2_decay_mul, bias_pref} = options;
+		let {in_sx, in_sy, in_depth, sx, sy, stride} = options;
 
 		let pad = typeof options.pad!=='undefined' ? options.pad : 0; // amount of 0 padding to add around borders of input volume
 
@@ -42,7 +38,8 @@ export class ConvLayer extends LayerBase<ConvLayer.JSON> implements ConvLayer.Un
 		super(LayerType.Conv,
 			Math.floor((in_sx + pad*2 - sx)/stride + 1),
 			Math.floor((in_sy + pad*2 - sy)/stride + 1),
-			options.filters);
+			options.filters,
+			options);
 
 		this.in_depth = in_depth;
 		this.in_sx = in_sx;
@@ -53,18 +50,9 @@ export class ConvLayer extends LayerBase<ConvLayer.JSON> implements ConvLayer.Un
 		this.sy = sy = typeof sy!=='undefined' ? sy : sx;
 		this.stride = typeof stride!=='undefined' ? stride : 1; // stride at which we apply filters to input volume
 		this.pad = pad;
-		this.l1_decay_mul = typeof l1_decay_mul!=='undefined' ? l1_decay_mul : 0.0;
-		this.l2_decay_mul = typeof l2_decay_mul!=='undefined' ? l2_decay_mul : 1.0;
 
-		// computed
-		this.layer_type = 'conv';
-
-		// initializations
-		const bias = typeof bias_pref!=='undefined' ? bias_pref : 0.0;
-		this.filters = [];
 		for(let i = 0; i<this.out_depth; i++)
 		{ this.filters.push(new Vol(sx, sy, in_depth)); }
-		this.biases = new Vol(1, 1, this.out_depth, bias);
 
 	}
 
@@ -168,26 +156,6 @@ export class ConvLayer extends LayerBase<ConvLayer.JSON> implements ConvLayer.Un
 		}
 	}
 
-	getParamsAndGrads():ConvLayer.ParamsAndGrads[]
-	{
-		const response:ConvLayer.ParamsAndGrads[] = [];
-		for(let i = 0; i<this.out_depth; i++)
-		{
-			response.push({
-				params: this.filters[i].w,
-				grads: this.filters[i].dw,
-				l2_decay_mul: this.l2_decay_mul,
-				l1_decay_mul: this.l1_decay_mul
-			});
-		}
-		response.push({
-			params: this.biases.w,
-			grads: this.biases.dw,
-			l1_decay_mul: 0.0,
-			l2_decay_mul: 0.0
-		});
-		return response;
-	}
 
 	toJSON():ConvLayer.JSON
 	toJSON<T extends IMap<any>>(json:T):T & ConvLayer.JSON
@@ -195,17 +163,9 @@ export class ConvLayer extends LayerBase<ConvLayer.JSON> implements ConvLayer.Un
 	{
 		json.sx = this.sx; // filter size in x, y dims
 		json.sy = this.sy;
-		json.stride = this.stride;
 		json.in_depth = this.in_depth;
-		json.l1_decay_mul = this.l1_decay_mul;
-		json.l2_decay_mul = this.l2_decay_mul;
+		json.stride = this.stride;
 		json.pad = this.pad;
-		json.filters = [];
-		for(let i = 0; i<this.filters.length; i++)
-		{
-			json.filters.push(this.filters[i].toJSON());
-		}
-		json.biases = this.biases.toJSON();
 
 		return super.toJSON(json);
 	}
@@ -216,20 +176,9 @@ export class ConvLayer extends LayerBase<ConvLayer.JSON> implements ConvLayer.Un
 
 		this.sx = json.sx; // filter size in x, y dims
 		this.sy = json.sy;
-		this.stride = json.stride;
 		this.in_depth = json.in_depth; // depth of input volume
-		this.filters = [];
-		this.l1_decay_mul = typeof json.l1_decay_mul!=='undefined' ? json.l1_decay_mul : 1.0;
-		this.l2_decay_mul = typeof json.l2_decay_mul!=='undefined' ? json.l2_decay_mul : 1.0;
+		this.stride = json.stride;
 		this.pad = typeof json.pad!=='undefined' ? json.pad : 0;
-		for(let i = 0; i<json.filters.length; i++)
-		{
-			const v = new Vol(0, 0, 0, 0);
-			v.fromJSON(json.filters[i]);
-			this.filters.push(v);
-		}
-		this.biases = new Vol(0, 0, 0, 0);
-		this.biases.fromJSON(json.biases);
 
 		return this;
 	}
@@ -240,32 +189,20 @@ export class ConvLayer extends LayerBase<ConvLayer.JSON> implements ConvLayer.Un
 export module ConvLayer
 {
 
-	export interface ParamsAndGrads {
-		params:Float64Array;
-		grads: Float64Array;
-		l2_decay_mul: number;
-		l1_decay_mul: number;
-	}
-
 	export interface Unique
 	{
 		sx:number; // filter size in x, y dims
 		sy:number;
 		stride:number;
-		l1_decay_mul:number;
-		l2_decay_mul:number;
 		pad:number;
+	}
+
+	export interface Options extends ConvLayerBase.Options, LayerIn, Unique
+	{
 		bias_pref:number;
-		biases:Vol;
 	}
 
-	export interface Options extends LayerIn, Unique
+	export interface JSON extends ConvLayerBase.JSON, LayerIn, Unique
 	{
-		filters:number;
-	}
-
-	export interface JSON extends Layer, LayerIn, Unique
-	{
-		filters:Vol[];
 	}
 }

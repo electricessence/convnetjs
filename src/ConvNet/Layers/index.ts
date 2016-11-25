@@ -12,6 +12,8 @@ import {TanhLayer} from "./Nonlinearities/Tanh";
 import {LossBase} from "./Loss/LossBase";
 import {LocalResponseNormalizationLayer} from "./LocalResponseNormalization";
 import {LayerTypeValue} from "../LayerTypeValue";
+import {ConvLayer} from "./DotProducts/ConvLayer";
+import {FullyConnLayer} from "./DotProducts/FullyConnLayer";
 
 const TypeRegistry:IMap<LayerConstructor> = {
 	input:InputLayer,
@@ -23,7 +25,9 @@ const TypeRegistry:IMap<LayerConstructor> = {
 	maxout:MaxoutLayer,
 	relu:ReluLayer,
 	tanh:TanhLayer,
-	lrn:LocalResponseNormalizationLayer
+	lrn:LocalResponseNormalizationLayer,
+	conv:ConvLayer,
+	fc:FullyConnLayer
 };
 Object.freeze(TypeRegistry);
 
@@ -37,6 +41,8 @@ export function newFromType(type:LayerTypeValue.Maxout, options?:MaxoutLayer.Opt
 export function newFromType(type:LayerTypeValue.Relu, options?:LayerIn):ReluLayer
 export function newFromType(type:LayerTypeValue.Tanh, options?:LayerIn):TanhLayer
 export function newFromType(type:LayerTypeValue.LocalResponseNormalization, options?:LocalResponseNormalizationLayer.Options):LocalResponseNormalizationLayer
+export function newFromType(type:LayerTypeValue.Conv, options?:LayerOut):ConvLayer
+export function newFromType(type:LayerTypeValue.FC, options?:LayerOut):FullyConnLayer
 export function newFromType(type:LayerTypeValue.Any, options?:IMap<any>):Layer {
 	return new TypeRegistry[type](options);
 }
@@ -51,5 +57,7 @@ export {
 	ReluLayer,
 	SigmoidLayer,
 	TanhLayer,
-	LocalResponseNormalizationLayer
+	LocalResponseNormalizationLayer,
+	ConvLayer,
+	FullyConnLayer
 }

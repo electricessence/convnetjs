@@ -1,37 +1,68 @@
 
-var FullyConnLayer = function(opt) {
-	var opt = opt || {};
+// This file contains all layers that do dot products with input,
+// but usually in a different connectivity pattern and weight sharing
+// schemes:
+// - FullyConn is fully connected dot products
+// - ConvLayer does convolutions (so weight sharing spatially)
+// putting them together in one file because they are very similar
+import {LayerIn} from "../../Layer";
+import {LayerTypeValue} from "../../LayerTypeValue";
+import {Vol} from "../../Vol";
+import {IMap} from "typescript-dotnet-umd/IMap";
+import {LayerType} from "../../LayerType";
+import {ConvLayerBase} from "./ConvLayerBase";
 
-	// required
-	// ok fine we will allow 'filters' as the word as well
-	this.out_depth = typeof opt.num_neurons !== 'undefined' ? opt.num_neurons : opt.filters;
+export class FullyConnLayer
+extends ConvLayerBase<FullyConnLayer.JSON>
+implements FullyConnLayer.Unique
+{
+	readonly layer_type:LayerTypeValue.FC;
 
-	// optional
-	this.l1_decay_mul = typeof opt.l1_decay_mul !== 'undefined' ? opt.l1_decay_mul : 0.0;
-	this.l2_decay_mul = typeof opt.l2_decay_mul !== 'undefined' ? opt.l2_decay_mul : 1.0;
+	num_inputs:number;
 
-	// computed
-	this.num_inputs = opt.in_sx * opt.in_sy * opt.in_depth;
-	this.out_sx = 1;
-	this.out_sy = 1;
-	this.layer_type = 'fc';
+	in_depth:number;
+	in_sx:number;
+	in_sy:number;
 
-	// initializations
-	var bias = typeof opt.bias_pref !== 'undefined' ? opt.bias_pref : 0.0;
-	this.filters = [];
-	for(var i=0;i<this.out_depth ;i++) { this.filters.push(new Vol(1, 1, this.num_inputs)); }
-	this.biases = new Vol(1, 1, this.out_depth, bias);
-}
+	sx:number;
+	sy:number;
+	stride:number;
+	pad:number;
 
-FullyConnLayer.prototype = {
-	forward: function(V, is_training) {
+	constructor(options:FullyConnLayer.Options = <any>{})
+	{
+		let {in_sx, in_sy, in_depth, num_neurons, filters} = options;
+
+		// note we are doing floor, so if the strided convolution of the filter doesn't fit into the input
+		// volume exactly, the output volume will be trimmed and not contain the (incomplete) computed
+		// final application.
+		super(LayerType.FC, 1, 1,
+			typeof num_neurons !== 'undefined' ? num_neurons : filters,
+			options);
+
+		this.in_depth = in_depth;
+		this.in_sx = in_sx;
+		this.in_sy = in_sy;
+
+		// computed
+		const ni = in_sx * in_sy * in_depth;
+		this.num_inputs = ni;
+
+		// initializations
+		for(let i =0; i<this.out_depth ; i++)
+		{ this.filters.push(new Vol(1, 1, ni)); }
+
+	}
+
+	forward(V:Vol, is_training?:boolean):Vol
+	{
 		this.in_act = V;
-		var A = new Vol(1, 1, this.out_depth, 0.0);
-		var Vw = V.w;
-		for(var i=0;i<this.out_depth;i++) {
-			var a = 0.0;
-			var wi = this.filters[i].w;
-			for(var d=0;d<this.num_inputs;d++) {
+		const A = new Vol(1, 1, this.out_depth, 0.0);
+		const Vw = V.w;
+		for(let i =0; i<this.out_depth; i++) {
+			let a = 0.0;
+			const wi = this.filters[i].w;
+			for(let d =0; d<this.num_inputs; d++) {
 				a += Vw[d] * wi[d]; // for efficiency use Vols directly for now
 			}
 			a += this.biases.w[i];
@@ -39,61 +70,65 @@ FullyConnLayer.prototype = {
 		}
 		this.out_act = A;
 		return this.out_act;
-	},
-	backward: function() {
-		var V = this.in_act;
-		V.dw = global.zeros(V.w.length); // zero out the gradient in input Vol
+	}
+
+	backward():void
+	{
+		if(!this.in_act || !this.out_act)
+			throw "Propagating in wrong order.";
+
+		const V = this.in_act;
+		V.dw = new Float64Array(V.w.length); // zero out the gradient in input Vol
 
 		// compute gradient wrt weights and data
-		for(var i=0;i<this.out_depth;i++) {
-			var tfi = this.filters[i];
-			var chain_grad = this.out_act.dw[i];
-			for(var d=0;d<this.num_inputs;d++) {
+		for(let i =0; i<this.out_depth; i++) {
+			const tfi = this.filters[i];
+			const chain_grad = this.out_act.dw[i];
+			for(let d =0; d<this.num_inputs; d++) {
 				V.dw[d] += tfi.w[d]*chain_grad; // grad wrt input data
 				tfi.dw[d] += V.w[d]*chain_grad; // grad wrt params
 			}
 			this.biases.dw[i] += chain_grad;
 		}
-	},
-	getParamsAndGrads: function() {
-		var response = [];
-		for(var i=0;i<this.out_depth;i++) {
-			response.push({params: this.filters[i].w, grads: this.filters[i].dw, l1_decay_mul: this.l1_decay_mul, l2_decay_mul: this.l2_decay_mul});
-		}
-		response.push({params: this.biases.w, grads: this.biases.dw, l1_decay_mul: 0.0, l2_decay_mul: 0.0});
-		return response;
-	},
-	toJSON: function() {
-		var json = {};
-		json.out_depth = this.out_depth;
-		json.out_sx = this.out_sx;
-		json.out_sy = this.out_sy;
-		json.layer_type = this.layer_type;
+	}
+
+	toJSON():FullyConnLayer.JSON
+	toJSON<T extends IMap<any>>(json:T):T & FullyConnLayer.JSON
+	toJSON(json:any = {}):any & FullyConnLayer.JSON
+	{
 		json.num_inputs = this.num_inputs;
-		json.l1_decay_mul = this.l1_decay_mul;
-		json.l2_decay_mul = this.l2_decay_mul;
-		json.filters = [];
-		for(var i=0;i<this.filters.length;i++) {
-			json.filters.push(this.filters[i].toJSON());
-		}
-		json.biases = this.biases.toJSON();
-		return json;
-	},
-	fromJSON: function(json) {
-		this.out_depth = json.out_depth;
-		this.out_sx = json.out_sx;
-		this.out_sy = json.out_sy;
-		this.layer_type = json.layer_type;
+
+		return super.toJSON(json);
+	}
+
+	fromJSON(json:FullyConnLayer.JSON):this
+	{
+		super.fromJSON(json);
+
 		this.num_inputs = json.num_inputs;
-		this.l1_decay_mul = typeof json.l1_decay_mul !== 'undefined' ? json.l1_decay_mul : 1.0;
-		this.l2_decay_mul = typeof json.l2_decay_mul !== 'undefined' ? json.l2_decay_mul : 1.0;
-		this.filters = [];
-		for(var i=0;i<json.filters.length;i++) {
-			var v = new Vol(0,0,0,0);
-			v.fromJSON(json.filters[i]);
-			this.filters.push(v);
-		}
-		this.biases = new Vol(0,0,0,0);
-		this.biases.fromJSON(json.biases);
+
+		return this;
+	}
+
+}
+
+
+
+export module FullyConnLayer
+{
+
+	export interface Unique
+	{
+		num_inputs:number;
+	}
+
+	export interface Options extends ConvLayerBase.Options, LayerIn, Unique
+	{
+		num_neurons?:number;
+	}
+
+	export interface JSON extends ConvLayerBase.JSON, LayerIn, Unique
+	{
 	}
 }
+
