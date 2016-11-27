@@ -1,137 +1,166 @@
-///<reference types="jquery"/>
-///<reference types="jqueryui"/>
-var N, data, labels;
-var ss = 30.0; // scale for drawing
-var layer_defs, net, trainer;
-// create neural net
-var t = "layer_defs = [];\n\
-layer_defs.push({type:'input', out_sx:1, out_sy:1, out_depth:1});\n\
-layer_defs.push({type:'fc', num_neurons:20, activation:'relu'});\n\
-layer_defs.push({type:'fc', num_neurons:20, activation:'sigmoid'});\n\
-layer_defs.push({type:'regression', num_neurons:1});\n\
-\n\
-net = new convnetjs.Net();\n\
-net.makeLayers(layer_defs);\n\
-\n\
-trainer = new convnetjs.SGDTrainer(net, {learning_rate:0.01, momentum:0.0, batch_size:1, l2_decay:0.001});\n\
-";
-var lix = 2; // layer id of layer we'd like to draw outputs of
-function reload() {
-    eval($("#layerdef").val());
-    // refresh buttons
-    var t = '';
-    for (var i = 1; i < net.layers.length - 1; i++) {
-        var butid = "button" + i;
-        t
-            += "<input id=\"" + butid + "\" value=\"" + net.layers[i].layer_type + "\" type=\"submit\" onclick=\"updateLix(" + i + ")\" style=\"width:80px; height: 30px; margin:5px;\";>";
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+(function (factory) {
+    if (typeof module === 'object' && typeof module.exports === 'object') {
+        var v = factory(require, exports); if (v !== undefined) module.exports = v;
     }
-    $("#layer_ixes").html(t);
-    $("#button" + lix).css('background-color', '#FFA');
-}
-function updateLix(newlix) {
-    $("#button" + lix).css('background-color', ''); // erase highlight
-    lix = newlix;
-    $("#button" + lix).css('background-color', '#FFA');
-}
-function regen_data() {
-    N = parseInt($("#num_data").val());
-    data = [];
-    labels = [];
-    for (var i = 0; i < N; i++) {
-        var x = Math.random() * 10 - 5;
-        var y = x * Math.sin(x);
-        data.push([x]);
-        labels.push([y]);
+    else if (typeof define === 'function' && define.amd) {
+        define(["require", "exports", "../../src/ConvNet/index", "../../src/ConvNet/Vol", "./npgmain"], factory);
     }
-}
-function myinit() {
-    regen_data();
-    $("#layerdef").val(t);
-    reload();
-}
-function update() {
-    // forward prop the data
-    var netx = new convnetjs.Vol(1, 1, 1);
-    avloss = 0.0;
-    for (var iters = 0; iters < 50; iters++) {
-        for (var ix = 0; ix < N; ix++) {
-            netx.w = data[ix];
-            var stats = trainer.train(netx, labels[ix]);
-            avloss += stats.loss;
+})(function (require, exports) {
+    "use strict";
+    ///<reference types="jquery"/>
+    ///<reference types="jqueryui"/>
+    var ConvNet = require("../../src/ConvNet/index");
+    var Vol_1 = require("../../src/ConvNet/Vol");
+    var npgmain_1 = require("./npgmain");
+    //noinspection JSUnusedLocalSymbols
+    var C = ConvNet;
+    var t = "\nlayer_defs = [];\nlayer_defs.push({type:'input', out_sx:1, out_sy:1, out_depth:1});\nlayer_defs.push({type:'fc', num_neurons:20, activation:'relu'});\nlayer_defs.push({type:'fc', num_neurons:20, activation:'sigmoid'});\nlayer_defs.push({type:'regression', num_neurons:1});\n\nnet = new ConvNet.Net();\nnet.makeLayers(layer_defs);\n\ntrainer = new ConvNet.Trainer(net, {learning_rate:0.01, momentum:0.0, batch_size:1, l2_decay:0.001});\n";
+    var ss = 30.0; // scale for drawing
+    var N;
+    var layer_defs;
+    var net;
+    var trainer;
+    var Regression = (function (_super) {
+        __extends(Regression, _super);
+        function Regression() {
+            _super.apply(this, arguments);
+            // create neural net
+            this.lix = 2; // layer id of layer we'd like to draw outputs of
         }
-    }
-    avloss /= N * iters;
-}
-function draw() {
-    var x;
-    ctx.clearRect(0, 0, WIDTH, HEIGHT);
-    ctx.fillStyle = "black";
-    var netx = new Vol(1, 1, 1);
-    // draw decisions in the grid
-    var density = 5.0;
-    var draw_neuron_outputs = $("#layer_outs").is(':checked');
-    // draw final decision
-    var neurons = [];
-    ctx.beginPath();
-    for (x = 0.0; x <= WIDTH; x += density) {
-        netx.w[0] = (x - WIDTH / 2) / ss;
-        var a = net.forward(netx);
-        var y = a.w[0];
-        if (draw_neuron_outputs) {
-            neurons.push(net.layers[lix].out_act.w); // back these up
-        }
-        if (x === 0)
-            ctx.moveTo(x, -y * ss + HEIGHT / 2);
-        else
-            ctx.lineTo(x, -y * ss + HEIGHT / 2);
-    }
-    ctx.stroke();
-    // draw individual neurons on first layer
-    if (draw_neuron_outputs) {
-        var NL = neurons.length;
-        ctx.strokeStyle = 'rgb(250,50,50)';
-        for (var k = 0; k < NL; k++) {
+        //noinspection JSMethodCanBeStatic
+        Regression.prototype.reload = function () {
+            eval($("#layerdef").val());
+            // refresh buttons
+            var t = '';
+            for (var i = 1; i < net.layers.length - 1; i++) {
+                var butid = "button" + i;
+                var onClick = 'R.updateLix(' + i + ')';
+                t
+                    += "<input id=\"" + butid + "\" value=\"" + net.layers[i].layer_type + "\" type=\"submit\" onclick=\"" + onClick + "\" style=\"width:80px; height: 30px; margin:5px;\"/>";
+            }
+            $("#layer_ixes").html(t);
+            $("#button" + this.lix).css('background-color', '#FFA');
+        };
+        //noinspection JSUnusedGlobalSymbols
+        Regression.prototype.updateLix = function (newlix) {
+            $("#button" + this.lix).css('background-color', ''); // erase highlight
+            $("#button" + newlix).css('background-color', '#FFA');
+            this.lix = newlix;
+        };
+        Regression.prototype.regen_data = function () {
+            N = parseInt($("#num_data").val());
+            this.data = [];
+            this.labels = [];
+            for (var i = 0; i < N; i++) {
+                var x = Math.random() * 10 - 5;
+                var y = x * Math.sin(x);
+                this.data.push([x]);
+                this.labels.push([y]);
+            }
+        };
+        Regression.prototype.init = function () {
+            this.regen_data();
+            $("#layerdef").val(t);
+            this.reload();
+        };
+        Regression.prototype.update = function () {
+            // forward prop the data
+            var netx = new Vol_1.Vol(1, 1, 1);
+            var avloss = 0.0;
+            var iters;
+            for (iters = 0; iters < 50; iters++) {
+                for (var ix = 0; ix < N; ix++) {
+                    netx.w = this.data[ix];
+                    var stats = trainer.train(netx, this.labels[ix]);
+                    avloss += stats.loss;
+                }
+            }
+            avloss /= N * iters;
+            this.avloss = avloss;
+        };
+        Regression.prototype.draw = function () {
+            var x;
+            var ctx = this.ctx;
+            ctx.clearRect(0, 0, this.width, this.height);
+            ctx.fillStyle = "black";
+            var netx = new Vol_1.Vol(1, 1, 1);
+            // draw decisions in the grid
+            var density = 5.0;
+            var draw_neuron_outputs = $("#layer_outs").is(':checked');
+            // draw final decision
+            var neurons = [];
             ctx.beginPath();
-            var n = 0;
-            for (x = 0.0; x <= WIDTH; x += density) {
+            for (x = 0.0; x <= this.width; x += density) {
+                netx.w[0] = (x - this.width / 2) / ss;
+                var a = net.forward(netx);
+                var y = a.w[0];
+                if (draw_neuron_outputs) {
+                    neurons.push(net.layers[this.lix].out_act.w); // back these up
+                }
                 if (x === 0)
-                    ctx.moveTo(x, -neurons[n][k] * ss + HEIGHT / 2);
+                    ctx.moveTo(x, -y * ss + this.height / 2);
                 else
-                    ctx.lineTo(x, -neurons[n][k] * ss + HEIGHT / 2);
-                n++;
+                    ctx.lineTo(x, -y * ss + this.height / 2);
             }
             ctx.stroke();
-        }
+            // draw individual neurons on first layer
+            if (draw_neuron_outputs) {
+                var NL = neurons.length;
+                ctx.strokeStyle = 'rgb(250,50,50)';
+                for (var k = 0; k < NL; k++) {
+                    ctx.beginPath();
+                    var n = 0;
+                    for (x = 0.0; x <= this.width; x += density) {
+                        if (x === 0)
+                            ctx.moveTo(x, -neurons[n][k] * ss + this.height / 2);
+                        else
+                            ctx.lineTo(x, -neurons[n][k] * ss + this.height / 2);
+                        n++;
+                    }
+                    ctx.stroke();
+                }
+            }
+            // draw axes
+            ctx.beginPath();
+            ctx.strokeStyle = 'rgb(50,50,50)';
+            ctx.lineWidth = 1;
+            ctx.moveTo(0, this.height / 2);
+            ctx.lineTo(this.width, this.height / 2);
+            ctx.moveTo(this.width / 2, 0);
+            ctx.lineTo(this.width / 2, this.height);
+            ctx.stroke();
+            // draw data-points. Draw support vectors larger
+            ctx.strokeStyle = 'rgb(0,0,0)';
+            ctx.lineWidth = 1;
+            for (var i = 0; i < N; i++) {
+                this.drawCircle(this.data[i] * ss + this.width / 2, -this.labels[i] * ss + this.height / 2, 5.0);
+            }
+            ctx.fillStyle = "blue";
+            ctx.font = "bold 16px Arial";
+            ctx.fillText("average loss: " + this.avloss, 20, 20);
+        };
+        //noinspection JSUnusedGlobalSymbols
+        Regression.prototype.mouseClick = function (x, y) {
+            // add data-point at location of click
+            this.data.push([(x - this.width / 2) / ss]);
+            this.labels.push([-(y - this.height / 2) / ss]);
+            N += 1;
+        };
+        Regression.prototype.keyDown = function () {
+        };
+        Regression.prototype.keyUp = function () {
+        };
+        return Regression;
+    }(npgmain_1.NPGMain));
+    exports.Regression = Regression;
+    function init(fps) {
+        return new Regression(fps);
     }
-    // draw axes
-    ctx.beginPath();
-    ctx.strokeStyle = 'rgb(50,50,50)';
-    ctx.lineWidth = 1;
-    ctx.moveTo(0, HEIGHT / 2);
-    ctx.lineTo(WIDTH, HEIGHT / 2);
-    ctx.moveTo(WIDTH / 2, 0);
-    ctx.lineTo(WIDTH / 2, HEIGHT);
-    ctx.stroke();
-    // draw datapoints. Draw support vectors larger
-    ctx.strokeStyle = 'rgb(0,0,0)';
-    ctx.lineWidth = 1;
-    for (var i = 0; i < N; i++) {
-        drawCircle(data[i] * ss + WIDTH / 2, -labels[i] * ss + HEIGHT / 2, 5.0);
-    }
-    ctx.fillStyle = "blue";
-    ctx.font = "bold 16px Arial";
-    ctx.fillText("average loss: " + avloss, 20, 20);
-}
-function mouseClick(x, y, shiftPressed) {
-    // add datapoint at location of click
-    data.push([(x - WIDTH / 2) / ss]);
-    labels.push([-(y - HEIGHT / 2) / ss]);
-    N += 1;
-}
-function keyDown(key) {
-}
-function keyUp(key) {
-}
-$(function () {
+    exports.init = init;
 });
 //# sourceMappingURL=regression.js.map
