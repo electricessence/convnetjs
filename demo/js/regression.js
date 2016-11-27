@@ -66,7 +66,7 @@ function draw() {
     var x;
     ctx.clearRect(0, 0, WIDTH, HEIGHT);
     ctx.fillStyle = "black";
-    var netx = new convnetjs.Vol(1, 1, 1);
+    var netx = new Vol(1, 1, 1);
     // draw decisions in the grid
     var density = 5.0;
     var draw_neuron_outputs = $("#layer_outs").is(':checked');

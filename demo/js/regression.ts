@@ -64,12 +64,12 @@ function myinit()
 
 function update()
 {
-	// forward prop the data
+// forward prop the data
 
 	const netx = new convnetjs.Vol(1, 1, 1);
 	avloss = 0.0;
 
-	for(var iters = 0; iters<50; iters++)
+	for(let iters = 0; iters<50; iters++)
 	{
 		for(let ix = 0; ix<N; ix++)
 		{
@@ -89,7 +89,7 @@ function draw()
 	ctx.clearRect(0, 0, WIDTH, HEIGHT);
 	ctx.fillStyle = "black";
 
-	const netx = new convnetjs.Vol(1, 1, 1);
+	const netx = new Vol(1, 1, 1);
 
 	// draw decisions in the grid
 	const density = 5.0;
