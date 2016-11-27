@@ -229,7 +229,7 @@ export class Brain implements Brain.Options
 		return NaN;
 	}
 
-	policy(s)
+	policy(s:Float64Array):{action:number, value:number}
 	{
 		// compute the value of doing any action in this state
 		// and return the argmax action and its value
@@ -325,7 +325,7 @@ export class Brain implements Brain.Options
 		return action;
 	}
 
-	backward(reward:number)
+	backward(reward:number):void
 	{
 		let e;
 		this.latest_reward = reward;
