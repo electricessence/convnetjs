@@ -7,7 +7,6 @@
     }
 })(function (require, exports) {
     "use strict";
-    ///<reference types="node"/>
     require("mocha");
     var assert = require("assert");
     var ConvNet = require("../src/ConvNet/index");

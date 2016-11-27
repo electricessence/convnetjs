@@ -3,12 +3,12 @@
         var v = factory(require, exports); if (v !== undefined) module.exports = v;
     }
     else if (typeof define === 'function' && define.amd) {
-        define(["require", "exports", "./Net", './index', "../utility/Random", "./Trainer", "typescript-dotnet-umd/System/Collections/Array/Utility", "./Vol"], factory);
+        define(["require", "exports", "./Net", "./index", "../utility/Random", "./Trainer", "typescript-dotnet-umd/System/Collections/Array/Utility", "./Vol"], factory);
     }
 })(function (require, exports) {
     "use strict";
     var Net_1 = require("./Net");
-    var ConvNet = require('./index');
+    var ConvNet = require("./index");
     var Random_1 = require("../utility/Random");
     var Trainer_1 = require("./Trainer");
     var Utility_1 = require("typescript-dotnet-umd/System/Collections/Array/Utility");

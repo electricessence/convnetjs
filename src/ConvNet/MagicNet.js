@@ -3,11 +3,11 @@
         var v = factory(require, exports); if (v !== undefined) module.exports = v;
     }
     else if (typeof define === 'function' && define.amd) {
-        define(["require", "exports", '../utility/Random', "./LayerType", "typescript-dotnet-umd/System/Collections/Array/Utility", "./Net", "typescript-dotnet-umd/System/Collections/MapUtility", "./Trainer", "../utility/maxmin"], factory);
+        define(["require", "exports", "../utility/Random", "./LayerType", "typescript-dotnet-umd/System/Collections/Array/Utility", "./Net", "typescript-dotnet-umd/System/Collections/MapUtility", "./Trainer", "../utility/maxmin"], factory);
     }
 })(function (require, exports) {
     "use strict";
-    var Random_1 = require('../utility/Random');
+    var Random_1 = require("../utility/Random");
     var LayerType_1 = require("./LayerType");
     var Utility_1 = require("typescript-dotnet-umd/System/Collections/Array/Utility");
     var Net_1 = require("./Net");
@@ -186,11 +186,11 @@
                     // we will go on to another fold. reset all candidates nets
                     for (k = 0; k < this.candidates.length; k++) {
                         c = this.candidates[k];
-                        var net = new Net_1.Net();
-                        net.makeLayers(c.layer_defs);
-                        var trainer = new Trainer_1.Trainer(net, c.trainer_def);
-                        c.net = net;
-                        c.trainer = trainer;
+                        var net_1 = new Net_1.Net();
+                        net_1.makeLayers(c.layer_defs);
+                        var trainer_1 = new Trainer_1.Trainer(net_1, c.trainer_def);
+                        c.net = net_1;
+                        c.trainer = trainer_1;
                     }
                 }
             }
@@ -201,13 +201,13 @@
             var vals = [];
             var fold = this.folds[this.foldix]; // active fold
             for (var k = 0; k < this.candidates.length; k++) {
-                var net = this.candidates[k].net;
+                var net_2 = this.candidates[k].net;
                 var v = 0.0;
                 for (var q = 0; q < fold.test_ix.length; q++) {
                     var x = this.data[fold.test_ix[q]];
                     var l = this.labels[fold.test_ix[q]];
-                    net.forward(x);
-                    var yhat = net.getPrediction();
+                    net_2.forward(x);
+                    var yhat = net_2.getPrediction();
                     v += (yhat === l ? 1.0 : 0.0); // 0 1 loss
                 }
                 v /= fold.test_ix.length; // normalize
@@ -237,8 +237,8 @@
             // forward nets of all candidates and average the predictions
             var xout, n = 0, d;
             for (var j = 0; j < nv; j++) {
-                var net = eval_candidates[j].net;
-                var x = net.forward(data);
+                var net_3 = eval_candidates[j].net;
+                var x = net_3.forward(data);
                 if (j === 0) {
                     xout = x;
                     n = x.w.length;
@@ -285,9 +285,9 @@
             var len = this.ensemble_size = json.nets.length;
             this.evaluated_candidates = Utility_1.initialize(len);
             for (var i = 0; i < len; i++) {
-                var net = new Net_1.Net();
-                net.fromJSON(json.nets[i]);
-                this.evaluated_candidates[i] = { net: net };
+                var net_4 = new Net_1.Net();
+                net_4.fromJSON(json.nets[i]);
+                this.evaluated_candidates[i] = { net: net_4 };
             }
             return this;
         };
