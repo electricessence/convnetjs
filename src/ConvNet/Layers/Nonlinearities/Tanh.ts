@@ -1,5 +1,5 @@
 import {BasicLayerBase} from "../LayerBase";
-import {LayerIn} from "../../Layer";
+import {LayerIn} from "../Layer";
 import {Vol} from "../../Vol";
 import {LayerType} from "../../LayerType";
 import {LayerTypeValue} from "../../LayerTypeValue";
@@ -19,7 +19,7 @@ export class TanhLayer extends BasicLayerBase
 	}
 
 
-	forward(V:Vol, is_training?:boolean):Vol
+	forward(V:Vol):Vol
 	{
 		this.in_act = V;
 		const V2 = V.cloneAndZero();

@@ -1,10 +1,9 @@
 import {LayerBase} from "../LayerBase";
-import {Layer, LayerIn} from "../../Layer";
+import {LayerProperties, LayerIn} from "../Layer";
 import {Vol} from "../../Vol";
 import {IMap} from "typescript-dotnet-umd/IMap";
 import {LayerTypeValue} from "../../LayerTypeValue";
 import {LayerType} from "../../LayerType";
-
 
 
 /**
@@ -32,7 +31,7 @@ export class MaxoutLayer extends LayerBase<MaxoutLayer.JSON> implements MaxoutLa
 		this.switches = new Float64Array(in_sx*in_sy*depth); // useful for back-prop
 	}
 
-	forward(V:Vol, is_training?:boolean):Vol
+	forward(V:Vol):Vol
 	{
 		this.in_act = V;
 		const N = this.out_depth;
@@ -146,7 +145,7 @@ export module MaxoutLayer
 	export interface Options extends LayerIn, Unique
 	{
 	}
-	export interface JSON extends Layer, Unique
+	export interface JSON extends LayerProperties, Unique
 	{
 	}
 }

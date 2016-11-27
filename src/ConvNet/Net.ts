@@ -1,14 +1,19 @@
-import {assert} from '../utility/assert';
-import {LayerDefinition} from "./Layer";
-import * as Layers from './Layers/index';
+import {assert} from "../utility/assert";
+import {LayerDefinition, LayerProperties, IPropagate, Layer} from "./Layers/Layer";
+import {newFromType} from "./Layers/index";
+import {ParamsAndGrads} from "./Layers/ParamsAndGrads";
+import {Vol} from "./Vol";
+import {JsonSerializable} from "../JsonSerializable";
+import {IMap} from "typescript-dotnet-umd/IMap";
+import {initialize} from "typescript-dotnet-umd/System/Collections/Array/Utility";
 
 /**
  * Net manages a set of layers
  * For now constraints: Simple linear order of layers, first layer input last layer a cost layer
  */
-export class Net
+export class Net implements IPropagate, JsonSerializable<Net.JSON>
 {
-	layers:LayerDefinition[];
+	layers:Layer[];
 
 	constructor()
 	{
@@ -25,7 +30,6 @@ export class Net
 		assert(defs[0].type==='input', 'Error! First layer must be the input layer, to declare size of inputs');
 
 		// desugar layer_defs for adding activation, dropout layers etc
-		const desugar = ;
 		defs = desugar(defs);
 
 		// create the layers
@@ -41,65 +45,8 @@ export class Net
 				def.in_depth = prev.out_depth;
 			}
 
-			switch(def.type)
-			{
-				case 'fc':
-					this.layers.push(new Layers.FullyConnLayer(def));
-					break;
-				case 'lrn':
-					this.layers.push(new Layers.LocalResponseNormalizationLayer(def));
-					break;
-				case 'dropout':
-					this.layers.push(new Layers.DropoutLayer(def));
-					break;
-				case 'input':
-					this.layers.push(new Layers.InputLayer(def));
-					break;
-				case 'softmax':
-					this.layers.push(new Layers.SoftmaxLayer(def));
-					break;
-				case 'regression':
-					this.layers.push(new Layers.RegressionLayer(def));
-					break;
-				case 'conv':
-					this.layers.push(new Layers.ConvLayer(def));
-					break;
-				case 'pool':
-					this.layers.push(new Layers.PoolLayer(def));
-					break;
-				case 'relu':
-					this.layers.push(new Layers.ReluLayer(def));
-					break;
-				case 'sigmoid':
-					this.layers.push(new Layers.SigmoidLayer(def));
-					break;
-				case 'tanh':
-					this.layers.push(new Layers.TanhLayer(def));
-					break;
-				case 'maxout':
-					this.layers.push(new Layers.MaxoutLayer(def));
-					break;
-				case 'svm':
-					this.layers.push(new Layers.SVMLayer(def));
-					break;
-				default:
-					console.error('ERROR: UNRECOGNIZED LAYER TYPE: ' + def.type);
-			}
+			this.layers.push(newFromType(def));
 		}
-	}
-
-	// forward prop the network.
-	// The trainer class passes is_training = true, but when this function is
-	// called from outside (not from the trainer), it defaults to prediction mode
-	forward(V, is_training)
-	{
-		if(typeof(is_training)==='undefined') is_training = false;
-		let act = this.layers[0].forward(V, is_training);
-		for(let i = 1; i<this.layers.length; i++)
-		{
-			act = this.layers[i].forward(act, is_training);
-		}
-		return act;
 	}
 
 	getCostLoss(V, y)
@@ -109,8 +56,22 @@ export class Net
 		return this.layers[N - 1].backward(y);
 	}
 
-	// backprop: compute gradients wrt all parameters
-	backward(y)
+	// forward prop the network.
+	// The trainer class passes is_training = true, but when this function is
+	// called from outside (not from the trainer), it defaults to prediction mode
+	forward(V:Vol, is_training:boolean = false):Vol
+	{
+		let act = this.layers[0].forward(V, is_training);
+		for(let i = 1; i<this.layers.length; i++)
+		{
+			act = this.layers[i].forward(act, is_training);
+		}
+		return act;
+	}
+
+
+	// back-prop: compute gradients wrt all parameters
+	backward(y):number
 	{
 		const N = this.layers.length;
 		const loss = this.layers[N - 1].backward(y); // last layer assumed to be loss layer
@@ -121,29 +82,33 @@ export class Net
 		return loss;
 	}
 
-	getParamsAndGrads()
+	getParamsAndGrads():ParamsAndGrads[]
 	{
 		// accumulate parameters and gradients for the entire network
-		const response = [];
-		for(let i = 0; i<this.layers.length; i++)
+		const response:ParamsAndGrads[] = [];
+		for(let layer of this.layers)
 		{
-			const layer_reponse = this.layers[i].getParamsAndGrads();
-			for(let j = 0; j<layer_reponse.length; j++)
-			{
-				response.push(layer_reponse[j]);
-			}
+			const pg = layer.getParamsAndGrads();
+			for(let n of pg)
+				response.push(n);
 		}
 		return response;
 	}
 
-	getPrediction()
+	getPrediction():number
 	{
 		// this is a convenience function for returning the argmax
 		// prediction, assuming the last layer of the net is a softmax
-		const S = this.layers[this.layers.length - 1];
-		assert(S.layer_type==='softmax', 'getPrediction function assumes softmax as last layer of the net!');
+		const lastLayer = this.layers[this.layers.length - 1];
+		if(!lastLayer)
+			throw "Empty entry in layers array.";
 
-		const p = S.out_act.w;
+		assert(lastLayer.layer_type==='softmax', 'getPrediction function assumes softmax as last layer of the net!');
+
+		if(!lastLayer.out_act)
+			throw "out_act is not set.";
+
+		const p = lastLayer.out_act.w;
 		let maxv = p[0];
 		let maxi = 0;
 		for(let i = 1; i<p.length; i++)
@@ -157,56 +122,39 @@ export class Net
 		return maxi; // return index of the class with highest class probability
 	}
 
-	toJSON()
+	toJSON():Net.JSON
+	toJSON<T extends IMap<any>>(json:T):T & Net.JSON
+	toJSON(json:any = {}):any & Net.JSON
 	{
-		const json = {};
-		json.layers = [];
+		let layers    = this.layers,
+		    newLayers = initialize<LayerProperties>(layers.length);
+		json.layers = newLayers;
 		for(let i = 0; i<this.layers.length; i++)
 		{
-			json.layers.push(this.layers[i].toJSON());
+			newLayers[i] = layers[i].toJSON();
 		}
 		return json;
 	}
 
-	fromJSON(json)
+	fromJSON(json:Net.JSON):this
 	{
 		this.layers = [];
 		for(let i = 0; i<json.layers.length; i++)
 		{
 			const Lj = json.layers[i];
-			const t = Lj.layer_type;
-			let L;
-			if(t==='input')
-			{ L = new Layers.InputLayer(); }
-			if(t==='relu')
-			{ L = new Layers.ReluLayer(); }
-			if(t==='sigmoid')
-			{ L = new Layers.SigmoidLayer(); }
-			if(t==='tanh')
-			{ L = new Layers.TanhLayer(); }
-			if(t==='dropout')
-			{ L = new Layers.DropoutLayer(); }
-			if(t==='conv')
-			{ L = new Layers.ConvLayer(); }
-			if(t==='pool')
-			{ L = new Layers.PoolLayer(); }
-			if(t==='lrn')
-			{ L = new Layers.LocalResponseNormalizationLayer(); }
-			if(t==='softmax')
-			{ L = new Layers.SoftmaxLayer(); }
-			if(t==='regression')
-			{ L = new Layers.RegressionLayer(); }
-			if(t==='fc')
-			{ L = new Layers.FullyConnLayer(); }
-			if(t==='maxout')
-			{ L = new Layers.MaxoutLayer(); }
-			if(t==='svm')
-			{ L = new Layers.SVMLayer(); }
-			L.fromJSON(Lj);
-			this.layers.push(L);
+			this.layers.push(newFromType(Lj.layer_type, Lj));
 		}
+		return this;
 	}
 
+}
+
+export module Net
+{
+	export interface JSON
+	{
+		layers:LayerProperties[]
+	}
 }
 
 export default Net;

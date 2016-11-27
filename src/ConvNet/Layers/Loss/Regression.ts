@@ -28,7 +28,7 @@ export class RegressionLayer extends LossBase
 		if(!this.in_act || !this.out_act)
 			throw "Propagating in wrong order.";
 
-		if(!y)
+		if(y==void 0)
 			throw "Must provide y value.";
 
 		// compute and accumulate gradient wrt weights and bias of this layer

@@ -1,4 +1,4 @@
-import {LayerIn} from "../../Layer";
+import {LayerIn} from "../Layer";
 import {Vol} from "../../Vol";
 import {BasicLayerBase} from "../LayerBase";
 import {LayerTypeValue} from "../../LayerTypeValue";
@@ -19,7 +19,7 @@ export class SigmoidLayer extends BasicLayerBase
 		super(LayerType.Sigmoid, options);
 	}
 
-	forward(V:Vol, is_training?:boolean):Vol
+	forward(V:Vol):Vol
 	{
 		this.in_act = V;
 		const V2 = V.cloneAndZero();

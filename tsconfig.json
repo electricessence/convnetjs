@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    "outDir": "./build",
     "module": "umd",
     "target": "es5",
     "sourceMap": true,

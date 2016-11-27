@@ -20,7 +20,7 @@ export class SVMLayer extends LossBase
 		if(!this.in_act || !this.out_act)
 			throw "Propagating in wrong order.";
 
-		if(!y)
+		if(y==void 0)
 			throw "Must provide y value.";
 
 		Integer.assert(y);

@@ -1,5 +1,5 @@
 import {LayerBase} from "./LayerBase";
-import {Layer, LayerIn} from "../Layer";
+import {LayerProperties, LayerIn} from "./Layer";
 import {initialize} from "typescript-dotnet-umd/System/Collections/Array/Utility";
 import {Vol} from "../Vol";
 import {IMap} from "typescript-dotnet-umd/IMap";
@@ -106,7 +106,7 @@ export module DropoutLayer
 	export interface Options extends LayerIn, Unique
 	{
 	}
-	export interface JSON extends Layer, Unique
+	export interface JSON extends LayerProperties, Unique
 	{
 	}
 }

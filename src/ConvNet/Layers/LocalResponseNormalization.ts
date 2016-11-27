@@ -1,4 +1,4 @@
-import {LayerIn, Layer} from "../Layer";
+import {LayerIn, LayerProperties} from "./Layer";
 import {LayerTypeValue} from "../LayerTypeValue";
 import {LayerBase} from "./LayerBase";
 import {IMap} from "typescript-dotnet-umd/IMap";
@@ -37,7 +37,7 @@ export class LocalResponseNormalizationLayer extends LayerBase<LocalResponseNorm
 	}
 
 
-	forward(V:Vol, is_training?:boolean):Vol
+	forward(V:Vol):Vol
 	{
 		this.in_act = V;
 
@@ -62,7 +62,7 @@ export class LocalResponseNormalizationLayer extends LayerBase<LocalResponseNorm
 					}
 					den *= this.alpha/this.n;
 					den += this.k;
-					this._cache.set(x, y, i, den); // will be useful for backprop
+					this._cache.set(x, y, i, den); // will be useful for back-prop
 					den = Math.pow(den, this.beta);
 					A.set(x, y, i, ai/den);
 				}
@@ -152,7 +152,7 @@ export module LocalResponseNormalizationLayer
 	export interface Options extends LayerIn, Unique
 	{
 	}
-	export interface JSON extends Layer, Unique
+	export interface JSON extends LayerProperties, Unique
 	{
 	}
 }

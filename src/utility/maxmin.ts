@@ -3,7 +3,7 @@
  * @param w
  * @returns {{}}
  */
-export function maxmin(w:number[]):{maxi?: number, maxv?: number, mini?: number, minv?: number, dv?: number}
+export function maxmin(w:number[]|Float64Array):{maxi?: number, maxv?: number, mini?: number, minv?: number, dv?: number}
 {
 	if(w.length===0)
 	{ return {}; } // ... ;s

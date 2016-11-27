@@ -4,11 +4,12 @@
 // - FullyConn is fully connected dot products
 // - ConvLayer does convolutions (so weight sharing spatially)
 // putting them together in one file because they are very similar
-import {Layer} from "../../Layer";
+import {LayerProperties} from "../Layer";
 import {LayerTypeValue} from "../../LayerTypeValue";
 import {LayerBase} from "../LayerBase";
 import {Vol} from "../../Vol";
 import {IMap} from "typescript-dotnet-umd/IMap";
+import {ParamsAndGrads} from "../ParamsAndGrads";
 
 export abstract class ConvLayerBase<TJson extends ConvLayerBase.JSON>
 extends LayerBase<TJson> implements ConvLayerBase.Unique
@@ -48,9 +49,9 @@ extends LayerBase<TJson> implements ConvLayerBase.Unique
 
 	}
 
-	getParamsAndGrads():ConvLayerBase.ParamsAndGrads[]
+	getParamsAndGrads():ParamsAndGrads[]
 	{
-		const response:ConvLayerBase.ParamsAndGrads[] = [];
+		const response:ParamsAndGrads[] = [];
 		for(let i = 0; i<this.out_depth; i++)
 		{
 			response.push({
@@ -111,30 +112,23 @@ extends LayerBase<TJson> implements ConvLayerBase.Unique
 export module ConvLayerBase
 {
 
-	export interface ParamsAndGrads
-	{
-		params:Float64Array;
-		grads:Float64Array;
-		l2_decay_mul:number;
-		l1_decay_mul:number;
-	}
-
 	export interface Unique
 	{
-		l1_decay_mul:number;
-		l2_decay_mul:number;
-		biases:Vol;
+		l1_decay_mul?:number;
+		l2_decay_mul?:number;
+		biases?:Vol;
 	}
 
 	export interface Options extends Unique
 	{
 		filters:number;
-		bias_pref:number;
+		bias_pref?:number;
 	}
 
-	export interface JSON extends Layer, Unique
+	export interface JSON extends LayerProperties, Unique
 	{
 		filters:Vol[];
+		biases:Vol;
 	}
 }
 

@@ -1,11 +1,10 @@
-
 // This file contains all layers that do dot products with input,
 // but usually in a different connectivity pattern and weight sharing
 // schemes:
 // - FullyConn is fully connected dot products
 // - ConvLayer does convolutions (so weight sharing spatially)
 // putting them together in one file because they are very similar
-import {LayerIn} from "../../Layer";
+import {LayerIn} from "../Layer";
 import {LayerTypeValue} from "../../LayerTypeValue";
 import {Vol} from "../../Vol";
 import {IMap} from "typescript-dotnet-umd/IMap";
@@ -54,7 +53,7 @@ implements FullyConnLayer.Unique
 
 	}
 
-	forward(V:Vol, is_training?:boolean):Vol
+	forward(V:Vol):Vol
 	{
 		this.in_act = V;
 		const A = new Vol(1, 1, this.out_depth, 0.0);

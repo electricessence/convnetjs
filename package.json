@@ -1,7 +1,7 @@
 {
-  "name": "convnetts",
+  "name": "convnetjs",
   "version": "1.0.0",
-  "description": "ConvNetJS is a Javascript implementation of Neural networks, together with nice browser-based demos. It currently supports:",
+  "description": "ConvNetJS is a TypeScript/Javascript implementation of Neural networks, together with nice browser-based demos.",
   "main": "index.js",
   "directories": {
     "test": "test"
@@ -11,18 +11,28 @@
     "typescript-dotnet-umd": "^4.5.6"
   },
   "devDependencies": {
+    "@types/jquery": "^2.0.34",
+    "@types/jqueryui": "^1.11.31",
+    "@types/mocha": "^2.2.33",
+    "@types/node": "^6.0.51",
+    "assert": "^1.4.1",
     "jquery": "^3.1.1",
-    "jquery-csv": "^0.2.0"
-  },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "jquery-csv": "^0.2.0",
+    "mocha": "^3.2.0",
+    "requirejs": "^2.3.2",
+    "ts-node": "^1.7.0",
+    "typescript": "^2.0.10",
+    "typescript-dotnet-umd": "^4.6.2"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/electricessence/convnetjs.git"
   },
-  "author": "",
-  "license": "ISC",
+  "contributors": [
+    "karpathy",
+    "electricessence"
+  ],
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/electricessence/convnetjs/issues"
   },

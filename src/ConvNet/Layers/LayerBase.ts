@@ -1,10 +1,11 @@
 import {JsonSerializable} from "../../JsonSerializable";
 import {Vol} from "../Vol";
-import {Layer, LayerIn} from "../Layer";
+import {LayerProperties, LayerIn, IPropagate} from "./Layer";
 import {IMap} from "typescript-dotnet-umd/IMap";
 import {LayerTypeValue} from "../LayerTypeValue";
+import {ParamsAndGrads} from "./ParamsAndGrads";
 
-export abstract class LayerBase<TJson extends Layer> implements JsonSerializable<TJson>
+export abstract class LayerBase<TJson extends LayerProperties> implements IPropagate, JsonSerializable<TJson>
 {
 	constructor(
 		public readonly layer_type:LayerTypeValue.Any,
@@ -45,14 +46,14 @@ export abstract class LayerBase<TJson extends Layer> implements JsonSerializable
 	abstract backward():void;
 
 	//noinspection JSMethodCanBeStatic
-	getParamsAndGrads():any[]
+	getParamsAndGrads():ParamsAndGrads[]
 	{
 		return [];
 	}
 
 }
 
-export abstract class BasicLayerBase extends LayerBase<Layer>
+export abstract class BasicLayerBase extends LayerBase<LayerProperties>
 {
 	constructor(layer_type:LayerTypeValue.Any, opt:LayerIn)
 	{

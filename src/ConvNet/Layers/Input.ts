@@ -1,11 +1,11 @@
 import {getDefault} from "../../utility/getDefault";
 import {Vol} from "../Vol";
 import {LayerBase} from "./LayerBase";
-import {Layer, LayerOut} from "../Layer";
-import {LayerTypeValue} from "../LayerTypes";
+import {LayerProperties, LayerOut} from "./Layer";
+import {LayerTypeValue} from "../LayerTypeValue";
 
 
-export class InputLayer extends LayerBase<Layer>
+export class InputLayer extends LayerBase<LayerProperties>
 {
 	readonly layer_type:LayerTypeValue.Input;
 	in_act:Vol;

@@ -1,108 +1,123 @@
 <html>
 <head>
-<title>ConvNetJS demo: Image Painting</title>
-<link href='http://fonts.googleapis.com/css?family=Cabin' rel='stylesheet' type='text/css'>
-<link rel="stylesheet" href="css/style.css">
+	<title>ConvNetJS demo: Image Painting</title>
+	<link href='http://fonts.googleapis.com/css?family=Cabin' rel='stylesheet' type='text/css'>
+	<link rel="stylesheet" href="css/style.css">
 
-<link rel="stylesheet" href="../lib/jquery-ui/1.12.1/jquery-ui.min.css">
-<script src="../node_modules/jquery/dist/jquery.min.js"></script>
-<script src="../lib/jquery-ui/1.12.1/jquery-ui.min.js"></script>
+	<link rel="stylesheet" href="../lib/jquery-ui/1.12.1/jquery-ui.min.css">
+	<script src="../node_modules/jquery/dist/jquery.min.js"></script>
+	<script src="../lib/jquery-ui/1.12.1/jquery-ui.min.js"></script>
 
-<script src="../build/convnet.js"></script>
-<script src="js/image_regression.js"></script>
+	<script src="../node_modules/requirejs/require.js"></script>
+	<script src="_require.config.js"></script>
+	<script>
+		var reload;
+		require(["js/image_regression"], function(image_regression) {
+			reload = image_regression.reload;
+		});
+	</script>
 
-<style type="text/css">
-canvas { 
-    border: 1px solid #555;
-    margin-top: 10px;
-}
-#wrap {
-  width: 800px;
-  margin-right: auto;
-  margin-left: auto;
-  margin-bottom: 200px;
-}
-#gallery img {
-  width: 195px;
-  height: 195px;
-  display: inline-block;
-}
-</style>
+	<style type="text/css">
+		canvas {
+			border: 1px solid #555;
+			margin-top: 10px;
+		}
+
+		#wrap {
+			width: 800px;
+			margin-right: auto;
+			margin-left: auto;
+			margin-bottom: 200px;
+		}
+
+		#gallery img {
+			width: 195px;
+			height: 195px;
+			display: inline-block;
+		}
+	</style>
 
 </head>
 
 <body>
 
 <div id="wrap">
-<h1><a href="http://cs.stanford.edu/people/karpathy/convnetjs/">ConvnetJS</a> demo: Image "Painting"</h1>
+	<h1><a href="http://cs.stanford.edu/people/karpathy/convnetjs/">ConvNetJS</a> demo: Image "Painting"</h1>
 
-<p>This demo that treats the pixels of an image as a learning problem: it takes the (x,y) position on a grid and learns to predict the color at that point using regression to (r,g,b). It's a bit like compression, since the image information is encoded in the weights of the network, but almost certainly not of practical kind :)</p>
-<p>
-  Note that the entire ConvNetJS definition is shown in textbox below and it gets eval()'d to create the network, so feel free to fiddle with the parameters and hit "reload". I found that, empirically and interestingly, deeper networks tend to work much better on this task given a fixed parameter budget.
-</p>
+	<p>This demo that treats the pixels of an image as a learning problem: it takes the (x,y) position on a grid and
+		learns to predict the color at that point using regression to (r,g,b). It's a bit like compression, since the
+		image information is encoded in the weights of the network, but almost certainly not of practical kind :)</p>
+	<p>
+		Note that the entire ConvNetJS definition is shown in text-box below and it gets eval()'d to create the network,
+		so feel free to fiddle with the parameters and hit "reload". I found that, empirically and interestingly, deeper
+		networks tend to work much better on this task given a fixed parameter budget.
+	</p>
 
-<p>Report questions/bugs/suggestions to <a href="https://twitter.com/karpathy">@karpathy</a>.</p>
+	<p>Report questions/bugs/suggestions to <a href="https://twitter.com/karpathy">@karpathy</a>.</p>
 
-<label><textarea id="layerdef" style="width:100%; height:250px;"></textarea></label>
-<br /><br  />
-<input id="buttontp" type="submit" value="reload network" onclick="reload();" style="width: 200px; height: 30px;"/>
+	<label><textarea id="layerdef" style="width:100%; height:250px;"></textarea></label>
+	<br/><br/>
+	<input id="buttontp" type="submit" value="reload network" onclick="reload();" style="width: 200px; height: 30px;"/>
 
-<div style="float: right;">
-Choose your own image: 
-<input id="f" type="file" />
-</div>
+	<div style="float: right;">
+		Choose your own image:
+		<input id="f" type="file"/>
+	</div>
 
-<br>
+	<br>
 
-<div style="background-color: #EEE; padding: 10px; margin-top: 10px;">
-<div style="float: left; margin-left: 200px;">
-  Original Image<br>
-  <canvas id="canv_original"></canvas>
-</div>
-<div style="float: left; margin-left: 10px;">
-  Neural Network output<br>
-  <canvas id="canv_net"></canvas>
-</div>
+	<div style="background-color: #EEE; padding: 10px; margin-top: 10px;">
+		<div style="float: left; margin-left: 200px;">
+			Original Image<br>
+			<canvas id="canv_original"></canvas>
+		</div>
+		<div style="float: left; margin-left: 10px;">
+			Neural Network output<br>
+			<canvas id="canv_net"></canvas>
+		</div>
 
-<div style="clear:both;"></div>
-</div>
+		<div style="clear:both;"></div>
+	</div>
 
-<br>
-<div id="report"></div>
-<br>
+	<br>
+	<div id="report"></div>
+	<br>
 
-<div id="lr">Learning rate:</div>
-<div id="slider"></div>
-<div>The learning rate should probably be decreased over time (slide left) to let the network better overfit the training data. It's nice to not have to worry about overfitting.</div>
+	<div id="lr">Learning rate:</div>
+	<div id="slider"></div>
+	<div>The learning rate should probably be decreased over time (slide left) to let the network better over-fit the
+		training data. It's nice to not have to worry about over-fitting.
+	</div>
 
-<br><br>
-<div>
-  You can upload your own image above (click Choose File), or you can click on any of the images below to load them.
-</div>
-<div id="gallery">
-  <img src="images/cat.jpg" class="ci" />
-  <img src="images/esher.png" class="ci" />
-  <img src="images/pencils.png" class="ci" />
-  <img src="images/usa.png" class="ci" />
-  <img src="images/fractal.jpg" class="ci" />
-  <img src="images/dora.jpg" class="ci" />
-  <img src="images/rubiks.jpg" class="ci" />
-  <img src="images/earth.jpg" class="ci" />
-  <img src="images/fox.png" class="ci" />
-  <img src="images/twitter.png" class="ci" />
-  <img src="images/reddit.jpg" class="ci" />
-  <img src="images/chip.jpg" class="ci" />
-  <img src="images/jitendra.jpg" class="ci" />
-  <img src="images/tesla.jpg" class="ci" />
-  <img src="images/rainforest.jpg" class="ci" />
-  <img src="images/chess.png" class="ci" />
-  <img src="images/gradient.png" class="ci" />
-  <img src="images/battery.jpg" class="ci" />
-  <img src="images/starry.jpg" class="ci" />
-</div>
+	<br><br>
+	<div>
+		You can upload your own image above (click Choose File), or you can click on any of the images below to load
+		them.
+	</div>
+	<div id="gallery">
+		<img src="images/cat.jpg" class="ci"/>
+		<img src="images/esher.png" class="ci"/>
+		<img src="images/pencils.png" class="ci"/>
+		<img src="images/usa.png" class="ci"/>
+		<img src="images/fractal.jpg" class="ci"/>
+		<img src="images/dora.jpg" class="ci"/>
+		<img src="images/rubiks.jpg" class="ci"/>
+		<img src="images/earth.jpg" class="ci"/>
+		<img src="images/fox.png" class="ci"/>
+		<img src="images/twitter.png" class="ci"/>
+		<img src="images/reddit.jpg" class="ci"/>
+		<img src="images/chip.jpg" class="ci"/>
+		<img src="images/jitendra.jpg" class="ci"/>
+		<img src="images/tesla.jpg" class="ci"/>
+		<img src="images/rainforest.jpg" class="ci"/>
+		<img src="images/chess.png" class="ci"/>
+		<img src="images/gradient.png" class="ci"/>
+		<img src="images/battery.jpg" class="ci"/>
+		<img src="images/starry.jpg" class="ci"/>
+	</div>
 
-<br><br>
-<p>Go <a href="http://cs.stanford.edu/people/karpathy/convnetjs/">back to ConvNetJS</a></p>
+	<br><br>
+	<p>Go <a href="http://cs.stanford.edu/people/karpathy/convnetjs/">back to ConvNetJS</a></p>
 
 </div>
 

@@ -6,7 +6,7 @@
 // putting them together in one file because they are very similar
 import {IMap} from "typescript-dotnet-umd/IMap";
 import {LayerBase} from "./LayerBase";
-import {LayerIn, Layer} from "../Layer";
+import {LayerIn, LayerProperties} from "./Layer";
 import {LayerTypeValue} from "../LayerTypeValue";
 import {LayerType} from "../LayerType";
 import {Vol} from "../Vol";
@@ -59,7 +59,7 @@ implements PoolLayer.Unique, LayerIn
 
 	}
 
-	forward(V:Vol, is_training?:boolean):Vol
+	forward(V:Vol):Vol
 	{
 		this.in_act = V;
 
@@ -179,7 +179,7 @@ export module PoolLayer
 	{
 	}
 
-	export interface JSON extends Layer, LayerIn, Unique
+	export interface JSON extends LayerProperties, LayerIn, Unique
 	{
 	}
 }

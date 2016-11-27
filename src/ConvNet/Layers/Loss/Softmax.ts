@@ -30,7 +30,7 @@ export class SoftmaxLayer extends LossBase
 		super(LayerType.Softmax,opt);
 	}
 
-	forward(V:Vol, is_training?:boolean):Vol
+	forward(V:Vol):Vol
 	{
 		this.in_act = V;
 
@@ -72,7 +72,7 @@ export class SoftmaxLayer extends LossBase
 		if(!this.in_act || !this.out_act)
 			throw "Propagating in wrong order.";
 
-		if(!y)
+		if(y==void 0)
 			throw "Must provide y value.";
 
 		Integer.assert(y);

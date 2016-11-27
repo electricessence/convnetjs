@@ -9,6 +9,7 @@ export module Random
 	{
 		if(return_v)
 		{
+			//noinspection JSUnusedAssignment
 			return_v = false;
 			return v_val;
 		}

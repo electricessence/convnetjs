@@ -1,5 +1,5 @@
 import {LayerBase} from "../LayerBase";
-import {LayerIn, Layer} from "../../Layer";
+import {LayerIn, LayerProperties} from "../Layer";
 import {IMap} from "typescript-dotnet-umd/IMap";
 import {Vol} from "../../Vol";
 import {LayerTypeValue} from "../../LayerTypeValue";
@@ -33,7 +33,7 @@ export abstract class LossBase extends LayerBase<LossBase.JSON>
 		return this;
 	}
 
-	forward(V:Vol, is_training?:boolean):Vol
+	forward(V:Vol):Vol
 	{
 		this.in_act = V;
 		this.out_act = V;
@@ -52,7 +52,7 @@ export module LossBase
 	export interface Options extends LayerIn, Unique
 	{
 	}
-	export interface JSON extends Layer, Unique
+	export interface JSON extends LayerProperties, Unique
 	{
 	}
 }

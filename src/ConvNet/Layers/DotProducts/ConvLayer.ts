@@ -4,7 +4,7 @@
 // - FullyConn is fully connected dot products
 // - ConvLayer does convolutions (so weight sharing spatially)
 // putting them together in one file because they are very similar
-import {LayerIn} from "../../Layer";
+import {LayerIn} from "../Layer";
 import {LayerTypeValue} from "../../LayerTypeValue";
 import {Vol} from "../../Vol";
 import {IMap} from "typescript-dotnet-umd/IMap";
@@ -56,7 +56,7 @@ implements ConvLayer.Unique, LayerIn
 
 	}
 
-	forward(V:Vol, is_training?:boolean):Vol
+	forward(V:Vol):Vol
 	{
 		// optimized code by @mdda that achieves 2x speedup over previous version
 
@@ -192,14 +192,13 @@ export module ConvLayer
 	export interface Unique
 	{
 		sx:number; // filter size in x, y dims
-		sy:number;
+		sy?:number;
 		stride:number;
 		pad:number;
 	}
 
 	export interface Options extends ConvLayerBase.Options, LayerIn, Unique
 	{
-		bias_pref:number;
 	}
 
 	export interface JSON extends ConvLayerBase.JSON, LayerIn, Unique
